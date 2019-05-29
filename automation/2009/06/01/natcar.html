@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>NATCAR </title>
+  <meta name="description" content="NATCAR is a student design competition where teams design, build and race autonomous vehicles.">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/jekyll-simple/assets/evil-icons.min.css">
+  <script src="/jekyll-simple/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/jekyll-simple/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/jekyll-simple/automation/2009/06/01/natcar.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/jekyll-simple/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/jekyll-simple/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/jekyll-simple/">Home</a></li>
+          <li><a href="/jekyll-simple/archive">Projects</a></li>
+          <li><a href="/jekyll-simple/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">NATCAR </h1>
+    <p class="artilce_meta"><time datetime="2009-06-01T09:06:26-04:00" itemprop="datePublished">Jun 1, 2009</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <p><a href="https://www.ece.ucdavis.edu/natcar/">NATCAR</a> is a student design competition where teams design, build and race autonomous vehicles.<!--description--></p>
+
+<p>When I competed, the vehicle was on a track marked by 1″-wide white tape with a wire carrying a 75 kHz sinusoidal signal (100 mA rms) under the tape. My team of 3 designed a car that sensed magentic field created by the wire and fed that information in to a microcontroller to autonomously control the car.</p>
+
+<p>We all worked on the hardware design, but my primary responsibility was to program the microcontroller. I had to develop a <a href="https://en.wikipedia.org/wiki/PID_controller">PID control loop</a> for both acceleration and steering based on multiple sensor inputs, as well as build in extra logic to deal with complications of the track that the car had to navigate, which included sharp turns, crossed tracks, and penalties for straying too far. The code had to be optimized enough to run efficiently on a lightweight microcontroller, while still responsive enough to provide accurate real-time feedback to the drive motor and steering servo. Our team placed first at our college competition and 4th out of 29 in the national competition. This was a great practical application of coding and design that I found both challenging and rewarding.</p>
+
+<p><img src="/jekyll-simple/assets/img/NATCAR.JPG" alt="alt text" title="Our car" /></p>
+
+<p>For those interested in the fine details of the design and troubleshooting process, continue on.</p>
+
+<p>The digital control system consists of a steering control system based on magnetic feedback sensors and a speed control system based on an optical interrupt sensor.
+Before programming the processor to do any controlling, I had to calibrate the PWM signals for the steering servo as well as initialize and test the analog-to-digital converters. To calibrate the servo PWM signal I ran a simple test program to allow me to input a duty cycle and watch the results on the servo.
+The first issue I dealt with was how often and when to sample what. For the purely proportional version of steering control, I had used a constant-polling while loop to check and adjust the steering at every possible CPU cycle. However, I recognized that the time required to calculate the steering term would be too inconsistent to use for derivative or integral control and decided instead to move to fixed rate polling. Since the fastest PWM signal that our servo reliably works on is 300 Hz, I decided to sample the magnetic sensors at a multiple of 13 above that, average those readings to reduce noise, and apply steering controls at 300 Hz. To do this, I implemented steering control within a real-time interrupt set for 3.9 KHz with a divider of 13.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++">  <span class="c1">//init code to set the Adapt9S12E128 RTI to 3906Hz</span>
+  <span class="n">RTICTL</span> <span class="o">=</span> <span class="mh">0x20</span><span class="p">;</span> <span class="c1">// 2^10 / 13 Set RTI divider for 300HZ , 4 Hz time base 0x7F, 0x20 for 3906Hz</span></code></pre></figure>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="cp">#pragma interrupt_handler rti_handler
+</span><span class="kt">void</span> <span class="n">rti_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>
+  <span class="n">CRGFLG</span> <span class="o">|=</span> <span class="mh">0x80</span><span class="p">;</span> <span class="c1">// Clear the RTI Flag</span>
+
+  <span class="c1">//average readings per cycle to reduce noise</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">sensorcount</span> <span class="o">==</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// if new cycle, reset totals</span>
+  <span class="n">r1sensort</span> <span class="o">=</span> <span class="n">r2sensort</span> <span class="o">=</span> <span class="n">l1sensort</span> <span class="o">=</span> <span class="n">l2sensort</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> 
+  <span class="n">r1sensort</span> <span class="o">+=</span> <span class="n">ATDDR9H</span><span class="p">;</span> <span class="c1">// accumulate</span>
+  <span class="n">r2sensort</span> <span class="o">+=</span> <span class="n">ATDDR10H</span><span class="p">;</span>
+  <span class="n">l1sensort</span> <span class="o">+=</span> <span class="n">ATDDR13H</span><span class="p">;</span>
+  <span class="n">l2sensort</span> <span class="o">+=</span> <span class="n">ATDDR14H</span><span class="p">;</span>
+    
+  <span class="k">if</span><span class="p">(</span><span class="o">++</span><span class="n">sensorcount</span> <span class="o">==</span> <span class="mi">13</span><span class="p">)</span> <span class="c1">//time divider</span>
+  <span class="p">{</span>
+    <span class="n">sensorcount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">//reset counter</span>
+    <span class="n">r1sensor</span> <span class="o">=</span> <span class="n">r1sensort</span> <span class="o">/</span> <span class="mi">13</span><span class="p">;</span> <span class="c1">// set averages</span>
+    <span class="n">r2sensor</span> <span class="o">=</span> <span class="n">r2sensort</span> <span class="o">/</span> <span class="mi">13</span><span class="p">;</span>
+    <span class="n">l1sensor</span> <span class="o">=</span> <span class="n">l1sensort</span> <span class="o">/</span> <span class="mi">13</span><span class="p">;</span>
+    <span class="n">l2sensor</span> <span class="o">=</span> <span class="n">l2sensort</span> <span class="o">/</span> <span class="mi">13</span><span class="p">;</span>
+    <span class="c1">//steering control here</span></code></pre></figure>
+
+<p>Once a sampling rate was established, I started trying more elaborate control methods and immediately fried our servo power supply when trying a new method. The steering control had attempted to send a PWM signal with a duty cycle entirely out of the servo's operation range. Because of this malfunction, I then implemented a range check on the duty cycle before assigning it to the PWM signal. This assures that the servo operates within a safe range and that instead of railing to either side and drawing too much current while stuck, it merely sits at the left or right extreme without attempting to push past it, saving much power.	To implement the steering derivative, I save the last averaged position value, compare it to the current one, and add this term to the proportional term scaled by a constant. I also check that the derivative is larger than the amount expected by noise before applying it.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">if</span> <span class="p">(</span> <span class="n">dutycycle</span> <span class="o">&lt;</span> <span class="mi">55</span><span class="p">)</span> <span class="c1">// safetey checks to prevent blown servo</span>
+  <span class="n">dutycycle</span> <span class="o">=</span> <span class="mi">55</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">dutycycle</span> <span class="o">&gt;</span> <span class="mi">91</span><span class="p">)</span>
+  <span class="n">dutycycle</span> <span class="o">=</span> <span class="mi">91</span><span class="p">;</span> 
+  
+  <span class="n">PWMDTY5</span> <span class="o">=</span> <span class="n">dutycycle</span><span class="p">;</span> <span class="c1">//apply value to actual PWM channel</span></code></pre></figure>
+
+<p>To implement the steering integral, I used a circular queue of size 75 to keep track of the moving average position offset. The array was intialized to 0 since that represents center position.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="c1">//integration</span>
+<span class="n">positioni</span> <span class="o">=</span> <span class="n">positioni</span> <span class="o">%</span> <span class="n">arraySize</span><span class="p">;</span> <span class="c1">// keep circular array index in bounds</span>
+<span class="n">movingTotal</span> <span class="o">=</span> <span class="n">movingTotal</span> <span class="o">+</span> <span class="n">position</span> <span class="o">-</span> <span class="n">positionarray</span><span class="p">[</span><span class="n">positioni</span><span class="p">];</span> <span class="c1">//total = current total + current reading - oldest reading</span>
+<span class="n">positionarray</span><span class="p">[</span><span class="n">positioni</span><span class="p">]</span> <span class="o">=</span> <span class="n">position</span><span class="p">;</span> <span class="c1">//add current reading to array, overwriting oldest</span>
+<span class="n">positioni</span><span class="o">++</span><span class="p">;</span> <span class="c1">// increase array index</span>
+<span class="n">integral</span> <span class="o">=</span> <span class="n">movingTotal</span><span class="o">/</span><span class="n">arraySize</span><span class="p">;</span> <span class="c1">// update average	 </span></code></pre></figure>
+
+<p>To keep accurate track of the position of the car. We implemented 5 total sensors. 4 positional sensors plus 1 center sensor primarily to detect straightaways. We affixed these to a lego-based support in order to make it easy to recover from crashes and adjust positions when needed.
+<img src="/jekyll-simple/assets/img/NATCAR-front.JPG" alt="alt text" title="Sensors are the 5 blue inductors with green wires" />
+I added some basic logic to translate if the wire has gone past the outer sensors and treated that as maximum offset of that side. It helped to recover from turns that were taken too shraply. (More on this later)</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">r2sensor</span> <span class="o">&gt;</span> <span class="n">r1Zero</span> <span class="p">)</span> <span class="c1">//4sensor version</span>
+<span class="p">{</span>
+  <span class="n">rsensor</span> <span class="o">=</span> <span class="n">r2sensor</span> <span class="o">+</span> <span class="n">r1Offset</span><span class="p">;</span> <span class="c1">//if outer sensor is strong enough, use it for readings</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">r1sensor</span> <span class="o">&lt;</span> <span class="n">r2sensor</span>  <span class="p">)</span>
+    <span class="n">rsensor</span> <span class="o">=</span> <span class="n">r1Offset</span> <span class="o">+</span> <span class="mi">250</span><span class="p">;</span> <span class="c1">//if wire has passed all sensors, assume max value</span>
+<span class="p">}</span>
+<span class="k">else</span>
+  <span class="n">rsensor</span> <span class="o">=</span> <span class="n">r1sensor</span><span class="p">;</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">l2sensor</span> <span class="o">&gt;</span> <span class="n">l1Zero</span> <span class="p">)</span> <span class="c1">//4s</span>
+  <span class="p">{</span>
+    <span class="n">lsensor</span> <span class="o">=</span> <span class="n">l2sensor</span> <span class="o">+</span> <span class="n">l1Offset</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">l1sensor</span> <span class="o">&lt;</span> <span class="n">l2sensor</span> <span class="p">)</span>
+      <span class="n">lsensor</span> <span class="o">=</span> <span class="n">l1Offset</span> <span class="o">+</span> <span class="mi">250</span><span class="p">;</span>
+  <span class="p">}</span>
+<span class="k">else</span>
+  <span class="n">lsensor</span> <span class="o">=</span> <span class="n">l1sensor</span><span class="p">;</span></code></pre></figure>
+
+<p>As well as logic to deal with detecting crosses in the track</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="c1">//sharp cross detection, if both outer sensors are above threshold, must be at a cross, read inner sensors</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">r2sensor</span> <span class="o">&gt;</span> <span class="n">r1Zero</span> <span class="o">&amp;&amp;</span> <span class="n">l2sensor</span> <span class="o">&gt;</span> <span class="n">l1Zero</span><span class="p">)</span> <span class="c1">//4 sensor version</span>
+<span class="p">{</span>
+  <span class="n">lsensor</span> <span class="o">=</span> <span class="n">l1sensor</span><span class="p">;</span>
+  <span class="n">rsensor</span> <span class="o">=</span> <span class="n">r1sensor</span><span class="p">;</span>
+<span class="p">}</span></code></pre></figure>
+
+<p>and then scaled and combined the readings to use for the rest of the steering logic.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="n">rsensor</span> <span class="o">=</span> <span class="n">rsensor</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">;</span> <span class="c1">// scale down sensors to avoid overflow during evaluation</span>
+<span class="n">lsensor</span> <span class="o">=</span> <span class="n">lsensor</span> <span class="o">&gt;&gt;</span> <span class="mi">2</span><span class="p">;</span>
+<span class="n">position</span> <span class="o">=</span> <span class="n">rsensor</span> <span class="o">-</span> <span class="n">lsensor</span><span class="p">;</span> <span class="c1">// set position according to right and left sensor values</span></code></pre></figure>
+
+<p>We found that merely keeping track of which side we lost the track on wasn't enough to recover from losing it. So I also added some logic to detect this and slow down until recovered:</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="c1">//overshoot section, check if lower than zero values</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">l1sensor</span> <span class="o">&lt;</span> <span class="mi">17</span> <span class="o">&amp;&amp;</span> <span class="n">l2sensor</span> <span class="o">&lt;=</span> <span class="n">l1Zero</span> <span class="o">&amp;&amp;</span> <span class="n">r1sensor</span> <span class="o">&lt;</span> <span class="mi">17</span> <span class="o">&amp;&amp;</span> <span class="n">r2sensor</span> <span class="o">&lt;=</span> <span class="n">r1Zero</span> <span class="p">)</span>
+<span class="p">{</span>
+  <span class="n">overshootSpeed</span> <span class="o">=</span> <span class="mi">15</span><span class="p">;</span> <span class="c1">// set speed to slow down</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">lastposition</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="mi">100</span><span class="p">;</span> <span class="c1">// right overshoot, error = rightmost</span>
+  <span class="k">else</span>
+    <span class="n">position</span> <span class="o">=</span> <span class="o">-</span><span class="mi">100</span><span class="p">;</span> <span class="c1">//left overshoot, error = leftmost</span>
+<span class="p">}</span><span class="c1">//end overshoot</span>
+<span class="k">else</span>
+  <span class="n">overshootSpeed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// not in overshoot, no slow down</span></code></pre></figure>
+
+<p>To allow easy adjustments during the competition, all constants are controlled by potentiometers set up on the extra ATD channels.
+<img src="/jekyll-simple/assets/img/NATCAR-pots.JPG" alt="alt text" title="There's a 5th pot behind the blurry capacitor there." /></p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++">  <span class="c1">//read constants from inputs</span>
+  <span class="n">targetpulses</span> <span class="o">=</span> <span class="n">ATDDR7H</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span> <span class="c1">// 0-128</span>
+  <span class="n">intK</span> <span class="o">=</span> <span class="n">ATDDR5H</span><span class="p">;</span> <span class="c1">// 0-4  </span>
+  <span class="n">speedK</span> <span class="o">=</span> <span class="n">ATDDR4H</span><span class="p">;</span> <span class="c1">// 0-2</span>
+  <span class="n">steeringDvK</span> <span class="o">=</span> <span class="n">ATDDR6H</span><span class="p">;</span> <span class="c1">// 0-8</span>
+  <span class="n">steeringK</span><span class="o">=</span> <span class="n">ATDDR3H</span><span class="p">;</span> <span class="c1">// 0-.5</span></code></pre></figure>
+
+<p>Although ATD conversions are somewhat slow, it is still magnitudes faster than our sampling rate and the ATD conversions are done in a separate module and therefore do not use main CPU cycles to calculate. The main disadvantages are the five extra cycles of assigning values and the extra power of having the ATD module fully active at all times. However, the power use is negligible and the assignments are at the end of the RTI cycle to avoid delaying time-critical calculations. I could have used multiple DIP switches set up on binary channels, but with 16 ATD channels available that would use much less custom hardware, I found it much easier to use the ATD for setting constants.</p>
+
+<p>Speed control was a bit more difficult to program than the steering control section at first. Initially we used a non-feedback system which just sets the PWM signal proportional to a potentiometer. However, this, of course, is a very unreliable speed system to due variable load on the motor at different speeds. After having a pulse sensor set up on the axle, I programmed a speed control loop using the processor’s pulse accumulator module.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="o">++</span><span class="n">speedcalc</span> <span class="o">==</span> <span class="mi">195</span><span class="p">)</span> <span class="c1">// do every 30 RTI cycles</span>
+<span class="p">{</span>
+  <span class="n">speedcalc</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span><span class="c1">//reset time divider</span>
+
+  <span class="n">currentpulse1count</span> <span class="o">=</span> <span class="n">P1ACNT</span><span class="p">;</span> <span class="c1">//use both accumulators, 1 for rising edge</span>
+  <span class="n">currentpulse2count</span> <span class="o">=</span> <span class="n">P2ACNT</span><span class="p">;</span> <span class="c1">// 1 for falling edge, increases resolution entirely in software</span>
+  <span class="n">pulses1</span> <span class="o">=</span> <span class="n">currentpulse1count</span> <span class="o">-</span> <span class="n">lastpulse1count</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pulses1</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span> <span class="c1">// if overflowed</span>
+      <span class="n">pulses1</span> <span class="o">+=</span>  <span class="mh">0xFFFF</span><span class="p">;</span> <span class="c1">// add offset</span>
+  <span class="n">pulses2</span> <span class="o">=</span> <span class="n">currentpulse2count</span> <span class="o">-</span> <span class="n">lastpulse2count</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="n">pulses2</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">)</span>
+      <span class="n">pulses2</span> <span class="o">+=</span>  <span class="mh">0xFFFF</span><span class="p">;</span>	 
+  <span class="n">pulses</span> <span class="o">=</span> <span class="n">pulses1</span> <span class="o">+</span> <span class="n">pulses2</span><span class="p">;</span> <span class="c1">//total pulses</span></code></pre></figure>
+
+<p>The loop runs every 1/10th of a second and calculates how many pulses passed in that time and compares it to how many it wanted to pass in that time, which was set by a potentiometer. It checks the difference between the target number of pulses for the past 1/10th of a second and the actual pulses, and also the change in the actual pulses since the last cycle. Both terms are scaled by constants and added together to calculate a correction term, which is added to the current duty cycle.
+<img src="/jekyll-simple/assets/img/NATCAR-speed.JPG" alt="alt text" title="The optical sensor tracked the rate that the slots on the wheel passed" />
+We also added some logic to detect when the car was on a large stretch of straight track and speed up in that situation using our center sensor.</p>
+
+<figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">ATDDR12H</span> <span class="o">&gt;</span> <span class="n">SPEEDTHRESHOLD</span> <span class="o">&amp;&amp;</span> <span class="n">position</span> <span class="o">&lt;</span> <span class="mi">20</span> <span class="o">&amp;&amp;</span> <span class="n">position</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span> <span class="c1">//if track is ahead and car is going straight</span>
+  <span class="n">straightcount</span><span class="o">++</span><span class="p">;</span> <span class="c1">// increase time known to be going straight</span>
+<span class="k">else</span>
+  <span class="n">straightcount</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// else, reset time</span>
+<span class="k">if</span> <span class="p">(</span><span class="n">straightcount</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">)</span> <span class="c1">// if going straight long enough, add straightaway speed</span>
+  <span class="n">speedcorrection</span> <span class="o">=</span> <span class="p">(</span><span class="n">targetpulses</span><span class="o">+</span><span class="n">speedK</span> <span class="o">-</span> <span class="n">pulses</span><span class="p">)</span> <span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span> <span class="o">-</span> <span class="p">(</span><span class="n">pulses</span> <span class="o">-</span> <span class="n">lastpulses</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="o">/</span><span class="mi">5</span> <span class="o">-</span> <span class="n">overshootSpeed</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">;</span>
+<span class="k">else</span> <span class="c1">// else add normal speed</span>
+  <span class="n">speedcorrection</span> <span class="o">=</span> <span class="p">(</span><span class="n">targetpulses</span> <span class="o">-</span> <span class="n">pulses</span><span class="p">)</span> <span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span> <span class="o">-</span> <span class="p">(</span><span class="n">pulses</span> <span class="o">-</span> <span class="n">lastpulses</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="o">/</span><span class="mi">5</span> <span class="o">-</span> <span class="n">overshootSpeed</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">;</span></code></pre></figure>
+
+<p>For those that made it to the end, here's a nice macro shot of the microcontroller we used, the Adapt9S12E128. It utilizes a MC9S12E128 as the brains of the board.
+<img src="/jekyll-simple/assets/img/NATCAR-MC.JPG" alt="alt text" title="Thanks for reading!" /></p>
+
+<p><a href="/jekyll-simple/assets/NATCAR.c">Full MC code available here</a></p>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/jekyll-simple/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>
