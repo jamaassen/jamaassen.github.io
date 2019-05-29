@@ -4,10 +4,10 @@
     <title>Jeffrey Maassen</title>
     <description>A master student in the deparment of Computer Science, Stevens Institute of Technology.
 </description>
-    <link>https://jamaassen.github.io///</link>
-    <atom:link href="https://jamaassen.github.io///feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 28 May 2019 21:36:58 -0400</pubDate>
-    <lastBuildDate>Tue, 28 May 2019 21:36:58 -0400</lastBuildDate>
+    <link>https://jamaassen.github.io//</link>
+    <atom:link href="https://jamaassen.github.io//feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 28 May 2019 21:40:49 -0400</pubDate>
+    <lastBuildDate>Tue, 28 May 2019 21:40:49 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
@@ -16,8 +16,8 @@
 &lt;!--description--&gt;&lt;/p&gt;
 </description>
         <pubDate>Sun, 03 Jul 2016 00:00:00 -0400</pubDate>
-        <link>https://jamaassen.github.io///automation/2016/07/03/thermometer.html</link>
-        <guid isPermaLink="true">https://jamaassen.github.io///automation/2016/07/03/thermometer.html</guid>
+        <link>https://jamaassen.github.io//automation/2016/07/03/thermometer.html</link>
+        <guid isPermaLink="true">https://jamaassen.github.io//automation/2016/07/03/thermometer.html</guid>
         
         
         <category>Automation</category>
@@ -32,7 +32,7 @@
 
 &lt;p&gt;We all worked on the hardware design, but my primary responsibility was to program the microcontroller. I had to develop a &lt;a href=&quot;https://en.wikipedia.org/wiki/PID_controller&quot;&gt;PID control loop&lt;/a&gt; for both acceleration and steering based on multiple sensor inputs, as well as build in extra logic to deal with complications of the track that the car had to navigate, which included sharp turns, crossed tracks, and penalties for straying too far. The code had to be optimized enough to run efficiently on a lightweight microcontroller, while still responsive enough to provide accurate real-time feedback to the drive motor and steering servo. Our team placed first at our college competition and 4th out of 29 in the national competition. This was a great practical application of coding and design that I found both challenging and rewarding.&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;//assets/img/NATCAR.JPG&quot; alt=&quot;alt text&quot; title=&quot;Our car&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/assets/img/NATCAR.JPG&quot; alt=&quot;alt text&quot; title=&quot;Our car&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;For those interested in the fine details of the design and troubleshooting process, continue on.&lt;/p&gt;
 
@@ -83,7 +83,7 @@ The first issue I dealt with was how often and when to sample what. For the pure
 &lt;span class=&quot;n&quot;&gt;integral&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;movingTotal&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;arraySize&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// update average	 &lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;To keep accurate track of the position of the car. We implemented 5 total sensors. 4 positional sensors plus 1 center sensor primarily to detect straightaways. We affixed these to a lego-based support in order to make it easy to recover from crashes and adjust positions when needed.
-&lt;img src=&quot;//assets/img/NATCAR-front.JPG&quot; alt=&quot;alt text&quot; title=&quot;Sensors are the 5 blue inductors with green wires&quot; /&gt;
+&lt;img src=&quot;/assets/img/NATCAR-front.JPG&quot; alt=&quot;alt text&quot; title=&quot;Sensors are the 5 blue inductors with green wires&quot; /&gt;
 I added some basic logic to translate if the wire has gone past the outer sensors and treated that as maximum offset of that side. It helped to recover from turns that were taken too shraply. (More on this later)&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;r2sensor&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;r1Zero&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//4sensor version&lt;/span&gt;
@@ -133,7 +133,7 @@ I added some basic logic to translate if the wire has gone past the outer sensor
   &lt;span class=&quot;n&quot;&gt;overshootSpeed&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;0&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// not in overshoot, no slow down&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;To allow easy adjustments during the competition, all constants are controlled by potentiometers set up on the extra ATD channels.
-&lt;img src=&quot;//assets/img/NATCAR-pots.JPG&quot; alt=&quot;alt text&quot; title=&quot;There's a 5th pot behind the blurry capacitor there.&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;/assets/img/NATCAR-pots.JPG&quot; alt=&quot;alt text&quot; title=&quot;There's a 5th pot behind the blurry capacitor there.&quot; /&gt;&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;  &lt;span class=&quot;c1&quot;&gt;//read constants from inputs&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;targetpulses&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;ATDDR7H&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 0-128&lt;/span&gt;
@@ -161,7 +161,7 @@ I added some basic logic to translate if the wire has gone past the outer sensor
   &lt;span class=&quot;n&quot;&gt;pulses&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pulses1&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;+&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pulses2&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//total pulses&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;The loop runs every 1/10th of a second and calculates how many pulses passed in that time and compares it to how many it wanted to pass in that time, which was set by a potentiometer. It checks the difference between the target number of pulses for the past 1/10th of a second and the actual pulses, and also the change in the actual pulses since the last cycle. Both terms are scaled by constants and added together to calculate a correction term, which is added to the current duty cycle.
-&lt;img src=&quot;//assets/img/NATCAR-speed.JPG&quot; alt=&quot;alt text&quot; title=&quot;The optical sensor tracked the rate that the slots on the wheel passed&quot; /&gt;
+&lt;img src=&quot;/assets/img/NATCAR-speed.JPG&quot; alt=&quot;alt text&quot; title=&quot;The optical sensor tracked the rate that the slots on the wheel passed&quot; /&gt;
 We also added some logic to detect when the car was on a large stretch of straight track and speed up in that situation using our center sensor.&lt;/p&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;k&quot;&gt;if&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;ATDDR12H&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;SPEEDTHRESHOLD&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;lt;&lt;/span&gt; &lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;amp;&amp;amp;&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;position&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;&amp;gt;&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;//if track is ahead and car is going straight&lt;/span&gt;
@@ -174,13 +174,13 @@ We also added some logic to detect when the car was on a large stretch of straig
   &lt;span class=&quot;n&quot;&gt;speedcorrection&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;targetpulses&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;pulses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;n&quot;&gt;pulses&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;lastpulses&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;)&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;4&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;-&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;overshootSpeed&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;*&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;2&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;/&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;5&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;p&gt;For those that made it to the end, here's a nice macro shot of the microcontroller we used, the Adapt9S12E128. It utilizes a MC9S12E128 as the brains of the board.
-&lt;img src=&quot;//assets/img/NATCAR-MC.JPG&quot; alt=&quot;alt text&quot; title=&quot;Thanks for reading!&quot; /&gt;&lt;/p&gt;
+&lt;img src=&quot;/assets/img/NATCAR-MC.JPG&quot; alt=&quot;alt text&quot; title=&quot;Thanks for reading!&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;//assets/NATCAR.c&quot;&gt;Full MC code available here&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;/assets/NATCAR.c&quot;&gt;Full MC code available here&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 01 Jun 2009 09:06:26 -0400</pubDate>
-        <link>https://jamaassen.github.io///automation/2009/06/01/natcar.html</link>
-        <guid isPermaLink="true">https://jamaassen.github.io///automation/2009/06/01/natcar.html</guid>
+        <link>https://jamaassen.github.io//automation/2009/06/01/natcar.html</link>
+        <guid isPermaLink="true">https://jamaassen.github.io//automation/2009/06/01/natcar.html</guid>
         
         
         <category>Automation</category>
