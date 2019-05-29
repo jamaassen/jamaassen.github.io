@@ -5,8 +5,8 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>Home Project - Thermometer</title>
-  <meta name="description" content="To be updated">
+  <title>Home Arduino Project - Thermostat retrofit</title>
+  <meta name="description" content="Retrofitting an old Electric Baseboard heater with digital controls.">
 
   <!-- evil icon -->
 
@@ -16,8 +16,8 @@
   <!-- todo: include this into main.css -->
 
   <link rel="stylesheet" href="/css/main.css">
-  <link rel="canonical" href="https://jamaassen.github.io//automation/2016/07/03/thermometer.html">
-  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="https://jamaassen.github.io//feed.xml">
+  <link rel="canonical" href="http://localhost:4000/automation/2016/07/03/thermometer.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
 </head>
 
   <body>
@@ -60,13 +60,133 @@
             <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
 
   <header class="artilce_header">
-    <h1 class="artilce_title" itemprop="name headline">Home Project - Thermometer</h1>
+    <h1 class="artilce_title" itemprop="name headline">Home Arduino Project - Thermostat retrofit</h1>
     <p class="artilce_meta"><time datetime="2016-07-03T00:00:00-04:00" itemprop="datePublished">Jul 3, 2016</time></p>
   </header>
 
   <div class="article-content" itemprop="articleBody">
-    <p>To be updated
+    <p>Retrofitting an old Electric Baseboard heater with digital controls.
 <!--description--></p>
+
+<p>The goal was to turn to essentially turn some decades old electric baseboard heater with a simple on/off knob</p>
+
+<p><img src="/assets/img/old_and_busted.jpg" alt="alt text" title="old and busted" /></p>
+
+<p>into a heater with modern digital controls that could actually be set to a temperature <img src="/assets/img/newhotness.png" alt="alt text" title="new hotness" />
+ as well as be controlled without crawling to the corner of the room.
+This was in a rental, so I really didn't want to rip out anything or spend a lot of money, but I had plenty of time to be creative so I turned to <a href="https://www.arduino.cc/">Arduino</a>.</p>
+
+<p><a href="https://www.arduino.cc/"><img src="/assets/img/720px-Arduino_Logo-svg.png" width="50" /></a> is an open-source electronics platform based on easy-to-use hardware and software. It's intended for anyone making interactive projects.</p>
+
+<p><a href="/assets/img/Uno.jpg">Here</a> is a typical Arduino board with all the pinouts and features labeled:</p>
+
+<p><strong>So why Arduino?</strong></p>
+<ul>
+  <li>Cheap! Generic versions are &lt; $10 per controller. Full versions that support the development are ~$20.</li>
+  <li>Popular! <img src="/assets/img/ArduinoOSC.png" width="200" /></li>
+  <li>Lots of documentation, example, and public libraries</li>
+  <li>Works with many different hardware peripherals</li>
+  <li>Various starter kits available</li>
+  <li>Based on C++ which I am familiar with. Other languages also supported by open source efforts.</li>
+</ul>
+
+<p><br />
+<strong><em>How to start?</em></strong></p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Design considerations</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Heating element is 250VAC</td>
+      <td>Use a high powered relay to control</td>
+    </tr>
+    <tr>
+      <td>Quiet operation desired (in bedroom)</td>
+      <td>Use a solid state relay</td>
+    </tr>
+    <tr>
+      <td>Heating element is on the ground in a corner</td>
+      <td>Temp sensor needs to be closer to human</td>
+    </tr>
+    <tr>
+      <td>Ideal temp sensor and control location is opposite of a walkway and doorway to heater</td>
+      <td>Temp sensor and control needs to communicate wirelessly</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+<br /></p>
+
+<p><strong>Initial Design</strong>
+<img src="/assets/img/init-design.png" alt="" /></p>
+
+<p>So I started to put these elements together testing it along the way</p>
+
+<p><img src="/assets/img/wip1.jpg" alt="alt text" title="WIP" /></p>
+
+<p>Here is a test using a potentiometer as a temp controler knob. The basic idea was working!</p>
+
+<p><img src="/assets/img/wip2.jpg" alt="alt text" title="WIP" /></p>
+
+<p>I started with fairly basic code. <a href="/assets/Nano_receive-active-low.ino">Nano receiver code</a>, <a href="/assets/LCD-NRF_heater-digital.ino">UNO control code</a>.</p>
+
+<p>All the Nano module needed to do was receive the On or Off state of heating element from the nRF24L01 radios and send out the signal to turn the relay on or off. 
+The UNO module would handle the controls and temperature sensing, and this is when the problems got more interesting:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Analysis</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Temp sensor readings were unstable. Especially when lights changed or buttons pressed.</td>
+      <td>Cheap temp sensor from kit used relative voltage in mV range to indicate temperature. Power source fluctuates in that range enough to affect readings.</td>
+      <td>Switch to $1 digital sensor with digital communication: DS18B20</td>
+    </tr>
+    <tr>
+      <td>Wireless communication unstable or freezing</td>
+      <td>Wireless uses a lot of energy! Voltage was dropping on signal spikes</td>
+      <td>Add capacitor to nano side and voltage regulator to Uno side</td>
+    </tr>
+    <tr>
+      <td>LCD too bright at night</td>
+      <td>Need to find a way to dim the light</td>
+      <td>Implement PWM control for LCD backlight</td>
+    </tr>
+    <tr>
+      <td>Dim backlight using more power than full bright and heating up??</td>
+      <td><a href="https://forum.arduino.cc/index.php?topic=96747.0">LCD Shield had bad wiring</a>, PWM led to transistor breakdown</td>
+      <td>Rewire LCD backlight with resistor</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+<br />
+<strong>Future work for this project</strong></p>
+
+<p>At this point I was considering the following improvments:</p>
+
+<ul>
+  <li>3d Print a cover/enclosure for both sides  <img src="/assets/img/cover.jpg" width="100" /></li>
+  <li>Create a web server or connect to cloud via wifi</li>
+  <li>Create mobile app for remote control</li>
+  <li>Add A/C controls for my window unit via infrared</li>
+</ul>
+
+<p>However…</p>
+
+<p>Then I moved into a new apartment with modern heating and a Nest built in. Thus ends the project.</p>
 
   </div>
 

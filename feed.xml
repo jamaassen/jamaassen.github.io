@@ -4,20 +4,140 @@
     <title>Jeffrey Maassen</title>
     <description>A master student in the deparment of Computer Science, Stevens Institute of Technology.
 </description>
-    <link>https://jamaassen.github.io//</link>
-    <atom:link href="https://jamaassen.github.io//feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Tue, 28 May 2019 21:40:49 -0400</pubDate>
-    <lastBuildDate>Tue, 28 May 2019 21:40:49 -0400</lastBuildDate>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
+    <pubDate>Tue, 28 May 2019 23:04:27 -0400</pubDate>
+    <lastBuildDate>Tue, 28 May 2019 23:04:27 -0400</lastBuildDate>
     <generator>Jekyll v3.8.5</generator>
     
       <item>
-        <title>Home Project - Thermometer</title>
-        <description>&lt;p&gt;To be updated
+        <title>Home Arduino Project - Thermostat retrofit</title>
+        <description>&lt;p&gt;Retrofitting an old Electric Baseboard heater with digital controls.
 &lt;!--description--&gt;&lt;/p&gt;
+
+&lt;p&gt;The goal was to turn to essentially turn some decades old electric baseboard heater with a simple on/off knob&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/old_and_busted.jpg&quot; alt=&quot;alt text&quot; title=&quot;old and busted&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;into a heater with modern digital controls that could actually be set to a temperature &lt;img src=&quot;/assets/img/newhotness.png&quot; alt=&quot;alt text&quot; title=&quot;new hotness&quot; /&gt;
+ as well as be controlled without crawling to the corner of the room.
+This was in a rental, so I really didn't want to rip out anything or spend a lot of money, but I had plenty of time to be creative so I turned to &lt;a href=&quot;https://www.arduino.cc/&quot;&gt;Arduino&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.arduino.cc/&quot;&gt;&lt;img src=&quot;/assets/img/720px-Arduino_Logo-svg.png&quot; width=&quot;50&quot; /&gt;&lt;/a&gt; is an open-source electronics platform based on easy-to-use hardware and software. It's intended for anyone making interactive projects.&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;/assets/img/Uno.jpg&quot;&gt;Here&lt;/a&gt; is a typical Arduino board with all the pinouts and features labeled:&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;So why Arduino?&lt;/strong&gt;&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Cheap! Generic versions are &amp;lt; $10 per controller. Full versions that support the development are ~$20.&lt;/li&gt;
+  &lt;li&gt;Popular! &lt;img src=&quot;/assets/img/ArduinoOSC.png&quot; width=&quot;200&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;Lots of documentation, example, and public libraries&lt;/li&gt;
+  &lt;li&gt;Works with many different hardware peripherals&lt;/li&gt;
+  &lt;li&gt;Various starter kits available&lt;/li&gt;
+  &lt;li&gt;Based on C++ which I am familiar with. Other languages also supported by open source efforts.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;br /&gt;
+&lt;strong&gt;&lt;em&gt;How to start?&lt;/em&gt;&lt;/strong&gt;&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Design considerations&lt;/th&gt;
+      &lt;th&gt;Solution&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Heating element is 250VAC&lt;/td&gt;
+      &lt;td&gt;Use a high powered relay to control&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Quiet operation desired (in bedroom)&lt;/td&gt;
+      &lt;td&gt;Use a solid state relay&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Heating element is on the ground in a corner&lt;/td&gt;
+      &lt;td&gt;Temp sensor needs to be closer to human&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Ideal temp sensor and control location is opposite of a walkway and doorway to heater&lt;/td&gt;
+      &lt;td&gt;Temp sensor and control needs to communicate wirelessly&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;br /&gt;
+&lt;br /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;Initial Design&lt;/strong&gt;
+&lt;img src=&quot;/assets/img/init-design.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;So I started to put these elements together testing it along the way&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/wip1.jpg&quot; alt=&quot;alt text&quot; title=&quot;WIP&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;Here is a test using a potentiometer as a temp controler knob. The basic idea was working!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/assets/img/wip2.jpg&quot; alt=&quot;alt text&quot; title=&quot;WIP&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;I started with fairly basic code. &lt;a href=&quot;/assets/Nano_receive-active-low.ino&quot;&gt;Nano receiver code&lt;/a&gt;, &lt;a href=&quot;/assets/LCD-NRF_heater-digital.ino&quot;&gt;UNO control code&lt;/a&gt;.&lt;/p&gt;
+
+&lt;p&gt;All the Nano module needed to do was receive the On or Off state of heating element from the nRF24L01 radios and send out the signal to turn the relay on or off. 
+The UNO module would handle the controls and temperature sensing, and this is when the problems got more interesting:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Problem&lt;/th&gt;
+      &lt;th&gt;Analysis&lt;/th&gt;
+      &lt;th&gt;Solution&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Temp sensor readings were unstable. Especially when lights changed or buttons pressed.&lt;/td&gt;
+      &lt;td&gt;Cheap temp sensor from kit used relative voltage in mV range to indicate temperature. Power source fluctuates in that range enough to affect readings.&lt;/td&gt;
+      &lt;td&gt;Switch to $1 digital sensor with digital communication: DS18B20&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Wireless communication unstable or freezing&lt;/td&gt;
+      &lt;td&gt;Wireless uses a lot of energy! Voltage was dropping on signal spikes&lt;/td&gt;
+      &lt;td&gt;Add capacitor to nano side and voltage regulator to Uno side&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;LCD too bright at night&lt;/td&gt;
+      &lt;td&gt;Need to find a way to dim the light&lt;/td&gt;
+      &lt;td&gt;Implement PWM control for LCD backlight&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Dim backlight using more power than full bright and heating up??&lt;/td&gt;
+      &lt;td&gt;&lt;a href=&quot;https://forum.arduino.cc/index.php?topic=96747.0&quot;&gt;LCD Shield had bad wiring&lt;/a&gt;, PWM led to transistor breakdown&lt;/td&gt;
+      &lt;td&gt;Rewire LCD backlight with resistor&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;&lt;br /&gt;
+&lt;br /&gt;
+&lt;strong&gt;Future work for this project&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;At this point I was considering the following improvments:&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;3d Print a cover/enclosure for both sides  &lt;img src=&quot;/assets/img/cover.jpg&quot; width=&quot;100&quot; /&gt;&lt;/li&gt;
+  &lt;li&gt;Create a web server or connect to cloud via wifi&lt;/li&gt;
+  &lt;li&gt;Create mobile app for remote control&lt;/li&gt;
+  &lt;li&gt;Add A/C controls for my window unit via infrared&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;However…&lt;/p&gt;
+
+&lt;p&gt;Then I moved into a new apartment with modern heating and a Nest built in. Thus ends the project.&lt;/p&gt;
 </description>
         <pubDate>Sun, 03 Jul 2016 00:00:00 -0400</pubDate>
-        <link>https://jamaassen.github.io//automation/2016/07/03/thermometer.html</link>
-        <guid isPermaLink="true">https://jamaassen.github.io//automation/2016/07/03/thermometer.html</guid>
+        <link>http://localhost:4000/automation/2016/07/03/thermometer.html</link>
+        <guid isPermaLink="true">http://localhost:4000/automation/2016/07/03/thermometer.html</guid>
         
         
         <category>Automation</category>
@@ -179,8 +299,8 @@ We also added some logic to detect when the car was on a large stretch of straig
 &lt;p&gt;&lt;a href=&quot;/assets/NATCAR.c&quot;&gt;Full MC code available here&lt;/a&gt;&lt;/p&gt;
 </description>
         <pubDate>Mon, 01 Jun 2009 09:06:26 -0400</pubDate>
-        <link>https://jamaassen.github.io//automation/2009/06/01/natcar.html</link>
-        <guid isPermaLink="true">https://jamaassen.github.io//automation/2009/06/01/natcar.html</guid>
+        <link>http://localhost:4000/automation/2009/06/01/natcar.html</link>
+        <guid isPermaLink="true">http://localhost:4000/automation/2009/06/01/natcar.html</guid>
         
         
         <category>Automation</category>
