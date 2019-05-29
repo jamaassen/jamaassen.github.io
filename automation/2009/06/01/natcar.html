@@ -10,14 +10,14 @@
 
   <!-- evil icon -->
 
-  <link rel="stylesheet" href="/jekyll-simple/assets/evil-icons.min.css">
-  <script src="/jekyll-simple/assets/evil-icons.min.js"></script>
+  <link rel="stylesheet" href="//assets/evil-icons.min.css">
+  <script src="//assets/evil-icons.min.js"></script>
 
   <!-- todo: include this into main.css -->
 
-  <link rel="stylesheet" href="/jekyll-simple/css/main.css">
-  <link rel="canonical" href="http://localhost:4000/jekyll-simple/automation/2009/06/01/natcar.html">
-  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/jekyll-simple/feed.xml">
+  <link rel="stylesheet" href="//css/main.css">
+  <link rel="canonical" href="https://jamaassen.github.io///automation/2009/06/01/natcar.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="https://jamaassen.github.io///feed.xml">
 </head>
 
   <body>
@@ -26,7 +26,7 @@
         <div class="three columns">
           <header class="site-header">
 
-  <h2 class="logo"><a href="/jekyll-simple/">Jeffrey Maassen</a></h2>
+  <h2 class="logo"><a href="//">Jeffrey Maassen</a></h2>
 
   <div class="nav">
     
@@ -43,9 +43,9 @@
     <div class="site-nav">
       <nav>
         <ul class="page-link">
-          <li><a href="/jekyll-simple/">Home</a></li>
-          <li><a href="/jekyll-simple/archive">Projects</a></li>
-          <li><a href="/jekyll-simple/about">About</a></li>
+          <li><a href="//">Home</a></li>
+          <li><a href="//archive">Projects</a></li>
+          <li><a href="//about">About</a></li>
         </ul>
       </nav>
     </div>
@@ -71,7 +71,7 @@
 
 <p>We all worked on the hardware design, but my primary responsibility was to program the microcontroller. I had to develop a <a href="https://en.wikipedia.org/wiki/PID_controller">PID control loop</a> for both acceleration and steering based on multiple sensor inputs, as well as build in extra logic to deal with complications of the track that the car had to navigate, which included sharp turns, crossed tracks, and penalties for straying too far. The code had to be optimized enough to run efficiently on a lightweight microcontroller, while still responsive enough to provide accurate real-time feedback to the drive motor and steering servo. Our team placed first at our college competition and 4th out of 29 in the national competition. This was a great practical application of coding and design that I found both challenging and rewarding.</p>
 
-<p><img src="/jekyll-simple/assets/img/NATCAR.JPG" alt="alt text" title="Our car" /></p>
+<p><img src="//assets/img/NATCAR.JPG" alt="alt text" title="Our car" /></p>
 
 <p>For those interested in the fine details of the design and troubleshooting process, continue on.</p>
 
@@ -122,7 +122,7 @@ The first issue I dealt with was how often and when to sample what. For the pure
 <span class="n">integral</span> <span class="o">=</span> <span class="n">movingTotal</span><span class="o">/</span><span class="n">arraySize</span><span class="p">;</span> <span class="c1">// update average	 </span></code></pre></figure>
 
 <p>To keep accurate track of the position of the car. We implemented 5 total sensors. 4 positional sensors plus 1 center sensor primarily to detect straightaways. We affixed these to a lego-based support in order to make it easy to recover from crashes and adjust positions when needed.
-<img src="/jekyll-simple/assets/img/NATCAR-front.JPG" alt="alt text" title="Sensors are the 5 blue inductors with green wires" />
+<img src="//assets/img/NATCAR-front.JPG" alt="alt text" title="Sensors are the 5 blue inductors with green wires" />
 I added some basic logic to translate if the wire has gone past the outer sensors and treated that as maximum offset of that side. It helped to recover from turns that were taken too shraply. (More on this later)</p>
 
 <figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">r2sensor</span> <span class="o">&gt;</span> <span class="n">r1Zero</span> <span class="p">)</span> <span class="c1">//4sensor version</span>
@@ -172,7 +172,7 @@ I added some basic logic to translate if the wire has gone past the outer sensor
   <span class="n">overshootSpeed</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="c1">// not in overshoot, no slow down</span></code></pre></figure>
 
 <p>To allow easy adjustments during the competition, all constants are controlled by potentiometers set up on the extra ATD channels.
-<img src="/jekyll-simple/assets/img/NATCAR-pots.JPG" alt="alt text" title="There's a 5th pot behind the blurry capacitor there." /></p>
+<img src="//assets/img/NATCAR-pots.JPG" alt="alt text" title="There's a 5th pot behind the blurry capacitor there." /></p>
 
 <figure class="highlight"><pre><code class="language-c--" data-lang="c++">  <span class="c1">//read constants from inputs</span>
   <span class="n">targetpulses</span> <span class="o">=</span> <span class="n">ATDDR7H</span><span class="o">/</span><span class="mi">2</span><span class="p">;</span> <span class="c1">// 0-128</span>
@@ -200,7 +200,7 @@ I added some basic logic to translate if the wire has gone past the outer sensor
   <span class="n">pulses</span> <span class="o">=</span> <span class="n">pulses1</span> <span class="o">+</span> <span class="n">pulses2</span><span class="p">;</span> <span class="c1">//total pulses</span></code></pre></figure>
 
 <p>The loop runs every 1/10th of a second and calculates how many pulses passed in that time and compares it to how many it wanted to pass in that time, which was set by a potentiometer. It checks the difference between the target number of pulses for the past 1/10th of a second and the actual pulses, and also the change in the actual pulses since the last cycle. Both terms are scaled by constants and added together to calculate a correction term, which is added to the current duty cycle.
-<img src="/jekyll-simple/assets/img/NATCAR-speed.JPG" alt="alt text" title="The optical sensor tracked the rate that the slots on the wheel passed" />
+<img src="//assets/img/NATCAR-speed.JPG" alt="alt text" title="The optical sensor tracked the rate that the slots on the wheel passed" />
 We also added some logic to detect when the car was on a large stretch of straight track and speed up in that situation using our center sensor.</p>
 
 <figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="k">if</span> <span class="p">(</span><span class="n">ATDDR12H</span> <span class="o">&gt;</span> <span class="n">SPEEDTHRESHOLD</span> <span class="o">&amp;&amp;</span> <span class="n">position</span> <span class="o">&lt;</span> <span class="mi">20</span> <span class="o">&amp;&amp;</span> <span class="n">position</span> <span class="o">&gt;</span> <span class="o">-</span><span class="mi">20</span><span class="p">)</span> <span class="c1">//if track is ahead and car is going straight</span>
@@ -213,9 +213,9 @@ We also added some logic to detect when the car was on a large stretch of straig
   <span class="n">speedcorrection</span> <span class="o">=</span> <span class="p">(</span><span class="n">targetpulses</span> <span class="o">-</span> <span class="n">pulses</span><span class="p">)</span> <span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span> <span class="o">-</span> <span class="p">(</span><span class="n">pulses</span> <span class="o">-</span> <span class="n">lastpulses</span><span class="p">)</span><span class="o">*</span><span class="mi">4</span><span class="o">/</span><span class="mi">5</span> <span class="o">-</span> <span class="n">overshootSpeed</span><span class="o">*</span><span class="mi">2</span><span class="o">/</span><span class="mi">5</span><span class="p">;</span></code></pre></figure>
 
 <p>For those that made it to the end, here's a nice macro shot of the microcontroller we used, the Adapt9S12E128. It utilizes a MC9S12E128 as the brains of the board.
-<img src="/jekyll-simple/assets/img/NATCAR-MC.JPG" alt="alt text" title="Thanks for reading!" /></p>
+<img src="//assets/img/NATCAR-MC.JPG" alt="alt text" title="Thanks for reading!" /></p>
 
-<p><a href="/jekyll-simple/assets/NATCAR.c">Full MC code available here</a></p>
+<p><a href="//assets/NATCAR.c">Full MC code available here</a></p>
 
   </div>
 
@@ -237,7 +237,7 @@ We also added some logic to detect when the car was on a large stretch of straig
   <hr/>
 
   <section class="author">
-  <div class="authorimage box" style="background: url(/jekyll-simple/assets/img/Taffy.jpg)"></div>
+  <div class="authorimage box" style="background: url(//assets/img/Taffy.jpg)"></div>
   <div class="authorinfo box">
     <p>Author | David Lin</p>
     <p class="bio">
