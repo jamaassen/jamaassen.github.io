@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Computer Vision Framework 3 - Image Segmentation</title>
-  <meta name="description" content="">
+  <meta name="description" content="Image Segmentation is a very broad category of image processing, but the basic idea is to separate various elements of an image into segments of a particular...">
 
   <!-- evil icon -->
 
@@ -65,16 +65,15 @@
   </header>
 
   <div class="article-content" itemprop="articleBody">
-    <!--description-->
-
-<p><a href="https://en.wikipedia.org/wiki/Image_segmentation">Image Segmentation</a> is a very broad category of image processing, but the basic idea is to separate various elements of an image into segments of a particular kind. In this project I will try out segmenting some images by pixel colors using <a href="https://en.wikipedia.org/wiki/K-means_clustering">k-means clustering</a>, and by so called "Superpixels" using a simplified version of the <a href="https://infoscience.epfl.ch/record/149300">SLIC</a> algorithm.</p>
+    <p><a href="https://en.wikipedia.org/wiki/Image_segmentation">Image Segmentation</a> is a very broad category of image processing, but the basic idea is to separate various elements of an image into segments of a particular kind. In this project I will try out segmenting some images by pixel colors using <a href="https://en.wikipedia.org/wiki/K-means_clustering">k-means clustering</a>, and by so called "Superpixels" using a simplified version of the <a href="https://infoscience.epfl.ch/record/149300">SLIC</a> algorithm.</p>
 
 <p align="center">
-    <img src="/assets/img/cv3/SLIC_orig.png" />
+    <img src="/assets/img/cv3/SLIC_orig.png" height="200" />
     <br />
 <font size="1">Superpixel Segmentation example from <a href="https://infoscience.epfl.ch/record/149300">SLIC Superpixels</a> (Radhakrishna <i>et al.</i>)</font>
 </p>
 
+<!--description-->
 <p><strong>Pre-processing</strong></p>
 
 <p>This was my first vision project dealing with RGB color channels instead of grayscale, so I had to decide how to deal with the extra layer of information. I initially chose to treat each channel as its own matrix and do every operation independently. While this made the code easy to think through and ultimately <i>worked</i>, it slowed things down immensely as it prevented vectorized code as well as introduced problems when converting back to output. I instead recommend keeping colors together as a multidimensional matrix when doing this.</p>

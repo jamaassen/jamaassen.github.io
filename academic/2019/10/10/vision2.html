@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Computer Vision Framework 2 - Line Detection</title>
-  <meta name="description" content="">
+  <meta name="description" content="Line Detection in image processing is the process of extracting structural information from an image in order to identify features in the image that correspo...">
 
   <!-- evil icon -->
 
@@ -65,14 +65,12 @@
   </header>
 
   <div class="article-content" itemprop="articleBody">
-    <!--description-->
-
-<p>Line Detection in image processing is the process of extracting structural information from an image in order to identify features in the image that correspond to lines. This can help with identifying movement or perspective changes as well as help to overlay emphasis of lines such as the line of scrimmage and First Down marker in a football broadcast:</p>
+    <p>Line Detection in image processing is the process of extracting structural information from an image in order to identify features in the image that correspond to lines. This can help with identifying movement or perspective changes as well as help to overlay emphasis of lines such as the line of scrimmage and First Down marker in a football broadcast:</p>
 
 <p align="center">
     <img src="/assets/img/cv2/nfl_line.png" width="450" />
 </p>
-
+<!--description-->
 <p>I use two different algorithms for detecting lines for this project. The first is <a href="https://en.wikipedia.org/wiki/Random_sample_consensus">RANSAC</a> which is an iterative algorithm that is best for datasets with moderate matching parameters and is robust to noise and outliers as long as you have enough inliers to compensate. The second is <a href="https://en.wikipedia.org/wiki/Hough_transform">Hough Transform</a>, which is not as good at dealing with uniform noise, but ok with random noise and can be used for multi-model recognition in a single run of the algorithm.</p>
 
 <p><strong>Pre-processing</strong></p>

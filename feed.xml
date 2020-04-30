@@ -6,15 +6,13 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 29 Apr 2020 20:43:28 -0400</pubDate>
-    <lastBuildDate>Wed, 29 Apr 2020 20:43:28 -0400</lastBuildDate>
+    <pubDate>Wed, 29 Apr 2020 21:01:24 -0400</pubDate>
+    <lastBuildDate>Wed, 29 Apr 2020 21:01:24 -0400</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
         <title>Computer Vision Framework 5 - Non-Iterative Superpixel Segmentation</title>
-        <description>&lt;!--description--&gt;
-
-&lt;p&gt;This project is a continuation of the SLIC Superpixel segmentation project I &lt;a href=&quot;/academic/2019/11/07/vision3.html&quot;&gt;worked on earlier&lt;/a&gt;. SLIC is an inherently iterative algorithm which finds which pixels belong to which cluster centroids, moves the centroids, and checks again iteratively until convergence. This is a fairly memory intensive process due to the nature of every iteration has to keep track of every centroids relation to every pixel in range. It can be optimized for runtime by employing parallel calculations but the memory usage remains high regardless. &lt;a href=&quot;https://www.epfl.ch/labs/ivrl/research/snic-superpixels/&quot;&gt;SNIC&lt;/a&gt; improves upon this process in 2 main ways. It reduces memory usage by only checking nearby pixels at a given time instead of all in range, and eliminates the need for multiple iterations by online-updating the centroid locations as the algorithm runs. In order to do this, it uses a priority queue to keep tracking of the nearest-distance pixel to add to the cluster next. The only downside is due to this being mostly sequential, it cannot be parallelized as easily as SLIC. However if your main concern is memory usage or you do not have parallel computing capability on your platform, SNIC is a good alternative to SLIC.&lt;/p&gt;
+        <description>&lt;p&gt;This project is a continuation of the SLIC Superpixel segmentation project I &lt;a href=&quot;/academic/2019/11/07/vision3.html&quot;&gt;worked on earlier&lt;/a&gt;. &lt;!--description--&gt; SLIC is an inherently iterative algorithm which finds which pixels belong to which cluster centroids, moves the centroids, and checks again iteratively until convergence. This is a fairly memory intensive process due to the nature of every iteration has to keep track of every centroids relation to every pixel in range. It can be optimized for runtime by employing parallel calculations but the memory usage remains high regardless. &lt;a href=&quot;https://www.epfl.ch/labs/ivrl/research/snic-superpixels/&quot;&gt;SNIC&lt;/a&gt; improves upon this process in 2 main ways. It reduces memory usage by only checking nearby pixels at a given time instead of all in range, and eliminates the need for multiple iterations by online-updating the centroid locations as the algorithm runs. In order to do this, it uses a priority queue to keep tracking of the nearest-distance pixel to add to the cluster next. The only downside is due to this being mostly sequential, it cannot be parallelized as easily as SLIC. However if your main concern is memory usage or you do not have parallel computing capability on your platform, SNIC is a good alternative to SLIC.&lt;/p&gt;
 
 &lt;p&gt;This project was mostly about comparing the performance and trade-offs of SLIC vs SNIC, so below are the comparisons I did:&lt;/p&gt;
 
@@ -65,9 +63,9 @@ Therefore, if reduced memory usage and complexity are goals, SNIC is a good choi
     
       <item>
         <title>Computer Vision Framework 4 - Visual Recognition</title>
-        <description>&lt;!--description--&gt;
+        <description>&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Computer_vision#Recognition&quot;&gt;Visual Recognition&lt;/a&gt; is another broad category of image processing, which is simply the idea of identifying things in an image and typically labeling them as such. There is a large variety of things that computer vision can be used to recognized, but for this project we focus on categorizing an image based on colors in the image, as well as classifying pixels in a particular image.&lt;/p&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Computer_vision#Recognition&quot;&gt;Visual Recognition&lt;/a&gt; is another broad category of image processing, which is simply the idea of identifying things in an image and typically labeling them as such. There is a large variety of things that computer vision can be used to recognized, but for this project we focus on categorizing an image based on colors in the image, as well as classifying pixels in a particular image.&lt;/p&gt;
+&lt;!--description--&gt;
 
 &lt;p&gt;&lt;strong&gt;Image Classification&lt;/strong&gt;&lt;/p&gt;
 
@@ -140,16 +138,15 @@ I also tried various bin sizes. The best seems to be around 7-10 bins with the a
     
       <item>
         <title>Computer Vision Framework 3 - Image Segmentation</title>
-        <description>&lt;!--description--&gt;
-
-&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Image_segmentation&quot;&gt;Image Segmentation&lt;/a&gt; is a very broad category of image processing, but the basic idea is to separate various elements of an image into segments of a particular kind. In this project I will try out segmenting some images by pixel colors using &lt;a href=&quot;https://en.wikipedia.org/wiki/K-means_clustering&quot;&gt;k-means clustering&lt;/a&gt;, and by so called &quot;Superpixels&quot; using a simplified version of the &lt;a href=&quot;https://infoscience.epfl.ch/record/149300&quot;&gt;SLIC&lt;/a&gt; algorithm.&lt;/p&gt;
+        <description>&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Image_segmentation&quot;&gt;Image Segmentation&lt;/a&gt; is a very broad category of image processing, but the basic idea is to separate various elements of an image into segments of a particular kind. In this project I will try out segmenting some images by pixel colors using &lt;a href=&quot;https://en.wikipedia.org/wiki/K-means_clustering&quot;&gt;k-means clustering&lt;/a&gt;, and by so called &quot;Superpixels&quot; using a simplified version of the &lt;a href=&quot;https://infoscience.epfl.ch/record/149300&quot;&gt;SLIC&lt;/a&gt; algorithm.&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
-    &lt;img src=&quot;/assets/img/cv3/SLIC_orig.png&quot; /&gt;
+    &lt;img src=&quot;/assets/img/cv3/SLIC_orig.png&quot; height=&quot;200&quot; /&gt;
     &lt;br /&gt;
 &lt;font size=&quot;1&quot;&gt;Superpixel Segmentation example from &lt;a href=&quot;https://infoscience.epfl.ch/record/149300&quot;&gt;SLIC Superpixels&lt;/a&gt; (Radhakrishna &lt;i&gt;et al.&lt;/i&gt;)&lt;/font&gt;
 &lt;/p&gt;
 
+&lt;!--description--&gt;
 &lt;p&gt;&lt;strong&gt;Pre-processing&lt;/strong&gt;&lt;/p&gt;
 
 &lt;p&gt;This was my first vision project dealing with RGB color channels instead of grayscale, so I had to decide how to deal with the extra layer of information. I initially chose to treat each channel as its own matrix and do every operation independently. While this made the code easy to think through and ultimately &lt;i&gt;worked&lt;/i&gt;, it slowed things down immensely as it prevented vectorized code as well as introduced problems when converting back to output. I instead recommend keeping colors together as a multidimensional matrix when doing this.&lt;/p&gt;
@@ -211,14 +208,12 @@ I also tried various bin sizes. The best seems to be around 7-10 bins with the a
     
       <item>
         <title>Computer Vision Framework 2 - Line Detection</title>
-        <description>&lt;!--description--&gt;
-
-&lt;p&gt;Line Detection in image processing is the process of extracting structural information from an image in order to identify features in the image that correspond to lines. This can help with identifying movement or perspective changes as well as help to overlay emphasis of lines such as the line of scrimmage and First Down marker in a football broadcast:&lt;/p&gt;
+        <description>&lt;p&gt;Line Detection in image processing is the process of extracting structural information from an image in order to identify features in the image that correspond to lines. This can help with identifying movement or perspective changes as well as help to overlay emphasis of lines such as the line of scrimmage and First Down marker in a football broadcast:&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
     &lt;img src=&quot;/assets/img/cv2/nfl_line.png&quot; width=&quot;450&quot; /&gt;
 &lt;/p&gt;
-
+&lt;!--description--&gt;
 &lt;p&gt;I use two different algorithms for detecting lines for this project. The first is &lt;a href=&quot;https://en.wikipedia.org/wiki/Random_sample_consensus&quot;&gt;RANSAC&lt;/a&gt; which is an iterative algorithm that is best for datasets with moderate matching parameters and is robust to noise and outliers as long as you have enough inliers to compensate. The second is &lt;a href=&quot;https://en.wikipedia.org/wiki/Hough_transform&quot;&gt;Hough Transform&lt;/a&gt;, which is not as good at dealing with uniform noise, but ok with random noise and can be used for multi-model recognition in a single run of the algorithm.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Pre-processing&lt;/strong&gt;&lt;/p&gt;
@@ -296,16 +291,15 @@ We can apply this by approximating the derivatives needed &lt;i&gt;I&lt;sub&gt;x
     
       <item>
         <title>Computer Vision Framework 1 - Edge Detection</title>
-        <description>&lt;!--description--&gt;
-
-&lt;p&gt;In image processing, Edge Detection is the process of extracting structural information from an image in order to identify the edges of objects in the image in order to reduce the amount of visual information that needs to be processed. The results are interesting in themselves, but it is mostly useful for it's applications within higher level vision algorithms that can use detected edges to help identify moved or similar objects in different images or frames. Our first project in Computer Vision was to implement a simplified version of the &lt;a href=&quot;https://en.wikipedia.org/wiki/Canny_edge_detector&quot;&gt;Canny Edge Detector&lt;/a&gt; on a given grayscale image. The process was straightforward and mostly designed to make you familiar with the tools and methods you need to use to start doing image processing.&lt;/p&gt;
+        <description>&lt;p&gt;In image processing, Edge Detection is the process of extracting structural information from an image in order to identify the edges of objects in the image in order to reduce the amount of visual information that needs to be processed. The results are interesting in themselves, but it is mostly useful for it's applications within higher level vision algorithms that can use detected edges to help identify moved or similar objects in different images or frames. Our first project in Computer Vision was to implement a simplified version of the &lt;a href=&quot;https://en.wikipedia.org/wiki/Canny_edge_detector&quot;&gt;Canny Edge Detector&lt;/a&gt; on a given grayscale image. The process was straightforward and mostly designed to make you familiar with the tools and methods you need to use to start doing image processing.&lt;/p&gt;
 
 &lt;p align=&quot;center&quot;&gt;
   &lt;a href=&quot;https://en.wikipedia.org/wiki/Canny_edge_detector#/media/File:Valve_monochrome_canny_(6).PNG&quot; title=&quot;Wikipedia image example&quot;&gt;
     &lt;img src=&quot;/assets/img/cv1/wiki_canny_ex.png&quot; alt=&quot;Wikipedia image example&quot; width=&quot;450&quot; /&gt;
   &lt;/a&gt;
+  &lt;br /&gt;&lt;font size=&quot;1&quot;&gt;Canney Edge example from &lt;a href=&quot;https://en.wikipedia.org/wiki/Canny_edge_detector#Development_of_the_Canny_algorithm&quot;&gt;Wikipedia&lt;/a&gt;&lt;/font&gt;
 &lt;/p&gt;
-
+&lt;!--description--&gt;
 &lt;p&gt;We consider our simplified edge detector to consist of the following steps:&lt;/p&gt;
 
 &lt;ol&gt;

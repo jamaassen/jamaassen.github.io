@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   <title>Computer Vision Framework 5 - Non-Iterative Superpixel Segmentation</title>
-  <meta name="description" content="">
+  <meta name="description" content="This project is a continuation of the SLIC Superpixel segmentation project I worked on earlier.">
 
   <!-- evil icon -->
 
@@ -65,9 +65,7 @@
   </header>
 
   <div class="article-content" itemprop="articleBody">
-    <!--description-->
-
-<p>This project is a continuation of the SLIC Superpixel segmentation project I <a href="/academic/2019/11/07/vision3.html">worked on earlier</a>. SLIC is an inherently iterative algorithm which finds which pixels belong to which cluster centroids, moves the centroids, and checks again iteratively until convergence. This is a fairly memory intensive process due to the nature of every iteration has to keep track of every centroids relation to every pixel in range. It can be optimized for runtime by employing parallel calculations but the memory usage remains high regardless. <a href="https://www.epfl.ch/labs/ivrl/research/snic-superpixels/">SNIC</a> improves upon this process in 2 main ways. It reduces memory usage by only checking nearby pixels at a given time instead of all in range, and eliminates the need for multiple iterations by online-updating the centroid locations as the algorithm runs. In order to do this, it uses a priority queue to keep tracking of the nearest-distance pixel to add to the cluster next. The only downside is due to this being mostly sequential, it cannot be parallelized as easily as SLIC. However if your main concern is memory usage or you do not have parallel computing capability on your platform, SNIC is a good alternative to SLIC.</p>
+    <p>This project is a continuation of the SLIC Superpixel segmentation project I <a href="/academic/2019/11/07/vision3.html">worked on earlier</a>. <!--description--> SLIC is an inherently iterative algorithm which finds which pixels belong to which cluster centroids, moves the centroids, and checks again iteratively until convergence. This is a fairly memory intensive process due to the nature of every iteration has to keep track of every centroids relation to every pixel in range. It can be optimized for runtime by employing parallel calculations but the memory usage remains high regardless. <a href="https://www.epfl.ch/labs/ivrl/research/snic-superpixels/">SNIC</a> improves upon this process in 2 main ways. It reduces memory usage by only checking nearby pixels at a given time instead of all in range, and eliminates the need for multiple iterations by online-updating the centroid locations as the algorithm runs. In order to do this, it uses a priority queue to keep tracking of the nearest-distance pixel to add to the cluster next. The only downside is due to this being mostly sequential, it cannot be parallelized as easily as SLIC. However if your main concern is memory usage or you do not have parallel computing capability on your platform, SNIC is a good alternative to SLIC.</p>
 
 <p>This project was mostly about comparing the performance and trade-offs of SLIC vs SNIC, so below are the comparisons I did:</p>
 
