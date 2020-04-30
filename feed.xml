@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 29 Apr 2020 20:10:15 -0400</pubDate>
-    <lastBuildDate>Wed, 29 Apr 2020 20:10:15 -0400</lastBuildDate>
+    <pubDate>Wed, 29 Apr 2020 20:32:44 -0400</pubDate>
+    <lastBuildDate>Wed, 29 Apr 2020 20:32:44 -0400</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
@@ -80,9 +80,38 @@ I also tried various bin sizes. The best seems to be around 7-10 bins with the a
 &lt;p&gt;Here are the actual classification results on my average model with 8 bins per color channel, in red and green highlights with the training and test images for reference, as well as a accuracy summary below:&lt;/p&gt;
 &lt;p align=&quot;center&quot;&gt;
     &lt;img src=&quot;/assets/img/cv4/best_classification_results.jpg&quot; /&gt;
-    &lt;img src=&quot;/assets/img/cv4/accuracy.png&quot; /&gt;
+
 &lt;/p&gt;
-&lt;p&gt;We can see that the one misclassified image lacks any significant amount of red, unlike the inside city training images, while it does have more grays and slight blues. We can see a downside eof this classification method is that all structural information of the location of these colors is ignored. However it is very fast to calculate.&lt;/p&gt;
+&lt;center&gt;
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Label&lt;/th&gt;
+      &lt;th&gt;Accuracy&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;coast&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;forest&lt;/td&gt;
+      &lt;td&gt;1.00&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;inside_city&lt;/td&gt;
+      &lt;td&gt;0.75&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;OVERALL&lt;/td&gt;
+      &lt;td&gt;0.92&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+&lt;/center&gt;
+
+&lt;p&gt;&lt;br /&gt;The one image, &quot;insidecity_test2&quot;, lacks any significant amount of red, unlike the inside city training images, while it does have more grays and slight blues so it was misclassified as coast. We can see a downside of this classification method is that all structural information of the location of these colors is ignored. However it is very fast to calculate.&lt;/p&gt;
 
 &lt;p&gt;&lt;strong&gt;Pixel Classification&lt;/strong&gt;&lt;/p&gt;
 

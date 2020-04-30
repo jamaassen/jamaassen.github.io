@@ -80,9 +80,38 @@ I also tried various bin sizes. The best seems to be around 7-10 bins with the a
 <p>Here are the actual classification results on my average model with 8 bins per color channel, in red and green highlights with the training and test images for reference, as well as a accuracy summary below:</p>
 <p align="center">
     <img src="/assets/img/cv4/best_classification_results.jpg" />
-    <img src="/assets/img/cv4/accuracy.png" />
+
 </p>
-<p>We can see that the one misclassified image lacks any significant amount of red, unlike the inside city training images, while it does have more grays and slight blues. We can see a downside eof this classification method is that all structural information of the location of these colors is ignored. However it is very fast to calculate.</p>
+<center>
+<table>
+  <thead>
+    <tr>
+      <th>Label</th>
+      <th>Accuracy</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>coast</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td>forest</td>
+      <td>1.00</td>
+    </tr>
+    <tr>
+      <td>inside_city</td>
+      <td>0.75</td>
+    </tr>
+    <tr>
+      <td>OVERALL</td>
+      <td>0.92</td>
+    </tr>
+  </tbody>
+</table>
+</center>
+
+<p><br />The one image, "insidecity_test2", lacks any significant amount of red, unlike the inside city training images, while it does have more grays and slight blues so it was misclassified as coast. We can see a downside of this classification method is that all structural information of the location of these colors is ignored. However it is very fast to calculate.</p>
 
 <p><strong>Pixel Classification</strong></p>
 
