@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Computer Vision Framework 4 - Visual Recognition</title>
+  <meta name="description" content="">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/12/03/vision4.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Computer Vision Framework 4 - Visual Recognition</h1>
+    <p class="artilce_meta"><time datetime="2019-12-03T00:00:00-05:00" itemprop="datePublished">Dec 3, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <!--description-->
+
+<p><a href="https://en.wikipedia.org/wiki/Computer_vision#Recognition">Visual Recognition</a> is another broad category of image processing, which is simply the idea of identifying things in an image and typically labeling them as such. There is a large variety of things that computer vision can be used to recognized, but for this project we focus on categorizing an image based on colors in the image, as well as classifying pixels in a particular image.</p>
+
+<p><strong>Image Classification</strong></p>
+
+<p>For Image classification, we used the concept of creating histograms of color intensities for each color channel for the whole image. We had 3 different categories to train for: "coast", "forest", and "inside city". I tried two different approaches. First I created a list of histograms for each training image. Then use the label of the nearest neighbor to the test image for classification.
+Next, I created an average histogram for each label based on the average of the training image. I actually got better accuracy and faster classification for this method.
+I also tried various bin sizes. The best seems to be around 7-10 bins with the average model, but for individual there isn't a huge difference from 2-15 bins.</p>
+<p align="center">
+    <img src="/assets/img/cv4/bins_imclass.png" />
+</p>
+<p>Here are the actual classification results on my average model with 8 bins per color channel, in red and green highlights with the training and test images for reference, as well as a accuracy summary below:</p>
+<p align="center">
+    <img src="/assets/img/cv4/best_classification_results.jpg" />
+    <img src="/assets/img/cv4/accuracy.png" />
+</p>
+<p>We can see that the one misclassified image lacks any significant amount of red, unlike the inside city training images, while it does have more grays and slight blues. We can see a downside eof this classification method is that all structural information of the location of these colors is ignored. However it is very fast to calculate.</p>
+
+<p><strong>Pixel Classification</strong></p>
+
+<p>For Pixel classification we start with 1 training image and 4 testing images. The task was to first manually find the given the ground truth of sky pixels in the training image(by manual image masking techniques), then use k-means to find 10 "visual words" each for both "sky" pixels and "not sky" pixels. These visual words are essentially just pixel clusters, found in a similar way as "K-means color segmentation" of our <a href="/academic/2019/11/07/vision3.html">previous framework</a>. based on my past experience with slow sequential code when using k-means, I use as much vectorized numpy code as I could to keep it fast. Then I simply find the closest center for each pixel in a test image to classify. Here are the results:</p>
+
+<p align="center">
+    Training image:<br />
+    <img src="/assets/img/cv4/sky_train.jpg" />
+    <br /><br />Results:<br />
+    <img src="/assets/img/cv4/pixel_class_results.jpg" />
+</p>
+
+<p>This method works fairly well overall, but of course fails whenever there are non-sky pixels that are a close color to the sky or clouds. So the bluish flowers in test3 and white lines on the road on test 2 are identified as sky as well. You can also see some of the darker sky pixels in test4 are misclassified due to the training image only having brighter skys. A couple of ways to improve this would be to include spacial information for where sky pixels typically are, or to add extra logic to identify sky boundaries, such as assuming the sky is the largest contiguous section of sky pixels and ignoring other smaller sections.</p>
+
+<p><br />
+<br /></p>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>

@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Computer Vision Framework 2 - Line Detection</title>
+  <meta name="description" content="">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/10/10/vision2.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Computer Vision Framework 2 - Line Detection</h1>
+    <p class="artilce_meta"><time datetime="2019-10-10T00:00:00-04:00" itemprop="datePublished">Oct 10, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <!--description-->
+
+<p>Line Detection in image processing is the process of extracting structural information from an image in order to identify features in the image that correspond to lines. This can help with identifying movement or perspective changes as well as help to overlay emphasis of lines such as the line of scrimmage and First Down marker in a football broadcast:</p>
+
+<p align="center">
+    <img src="/assets/img/cv2/nfl_line.png" width="450" />
+</p>
+
+<p>I use two different algorithms for detecting lines for this project. The first is <a href="https://en.wikipedia.org/wiki/Random_sample_consensus">RANSAC</a> which is an iterative algorithm that is best for datasets with moderate matching parameters and is robust to noise and outliers as long as you have enough inliers to compensate. The second is <a href="https://en.wikipedia.org/wiki/Hough_transform">Hough Transform</a>, which is not as good at dealing with uniform noise, but ok with random noise and can be used for multi-model recognition in a single run of the algorithm.</p>
+
+<p><strong>Pre-processing</strong></p>
+
+<p>Before applying line detection, we need to identify points or "features" in the image that we can use to trace lines onto. There are a lot of different feature detection methods, but I use the <a href="https://en.wikipedia.org/wiki/Hessian_affine_region_detector">Hessian affine region detector</a> which is great for detecting corners and strongly textured areas. It works by using the hessian determinant of each pixel and then choosing the maxima of these (above a threshold) as a feature. The hessian determinant formula is as follows: <img src="/assets/img/cv2/hess_det.png" width="150" />
+We can apply this by approximating the derivatives needed <i>I<sub>x</sub></i> using Sobel filters on a gaussian blurred image and then applying non-maximum suppression.</p>
+
+<p>Here are the results of my hessian feature detecter, where feature pixels are in the green boxes:</p>
+
+<p align="center">
+    <img src="/assets/img/cv2/hess_box.png" />
+</p>
+
+<p><strong>Method 1 - RANSAC</strong></p>
+
+<p>RANSAC is a fairly well documented algorithm. The basic approach is, given a set of sample points that contribute to a model, random choose a minimal set of points , create a model from these points, and find out how many other points from the dataset closely adhere to that model, also known as inliers. We repeat this process until we happen upon a model that has either some chosen minimal threshold of inliers or has done enough samples to statistically happen upon a good model. In order to avoid pre-calculating the number of minimum samples, we can use the apparent inlier/outlier ratio as the algorithm goes to automatically adapt the minimum sample count, which is the method I used.</p>
+
+<p>Here are the results on a sample image, using Pillow to draw the detected lines in red and the matching inliers in green.</p>
+<p align="center">
+    <img src="/assets/img/cv2/ransac.png" />
+</p>
+
+<p><strong>Method 2 - Hough Transform</strong></p>
+
+<p>Hough Transforms have some other interesting applications compared to RANSAC, in that you cna use a model template to detect multiple different models within 1 run. However we were only searching for lines so this didn’t apply for us. The idea of Hough transform, is we find a coordinate space that covers all possible representations of the model we are matching, and then have every feature pixel in the image vote into “bins” for each model that would correspond with that pixel. Afterwords you choose the points in the coordinate space with the most votes as the strongest models. You do have to do some additional steps to avoid overlapping models. I simply applied non-maximum suppression of nearby bins. I also had to choose my coordinate space resolution (AKA voting bin size) in a way that balances algorithm run time with accuracy of model representation in the final image. I used the polar formula of a line model <img src="/assets/img/cv2/polar_line.png" width="150" /> with rho and theta as my coordinate space. This led to the below voting bins with the top 4 detected maxima in green boxes with vote counts:</p>
+<p align="center">
+    <img src="/assets/img/cv2/accum_best.png" />
+</p>
+
+<p>Below is the final image with detected lines shown in red and the feature pixels that voted for them in green. You can see the tree introduced enough semi-uniform noise such that the 4th strongest line detected corresponded with those feature points, but it was otherwise successful.</p>
+<p align="center">
+    <img src="/assets/img/cv2/hough.png" />
+</p>
+
+<p>It was fun to get RANSAC working, and useful to see the effect of the adaptive element on run time. The visualization of the intermediate steps of hough really helped to fully understand how the algorithm was working. Overall this project went fairly smoothly and most time was spent on optimization and improving visualizations. Here are some challenges I ran into during the project:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Analysis</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Drawing lines/boxes to the image was not matching the correct location at all</td>
+      <td>Pillow image library uses reverse x,y coordinate system when drawing for legacy compatibility reasons</td>
+      <td>Simply reversed x,y in the command and it worked fine</td>
+    </tr>
+    <tr>
+      <td>Drawn lines were off by a few pixels when overlayed on an image</td>
+      <td>The Gaussian Blur and Sobel filter steps involved trimming some pixels near the borders. The detected feature locations did not have these offsets included</td>
+      <td>Added offset auto-detection to code and added these offsets whenever drawing to image</td>
+    </tr>
+    <tr>
+      <td>RANSAC was taking super long time to run</td>
+      <td>Adaptive algorithm was not working properly</td>
+      <td>Added debug status printing to find and correct the error</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+<br /></p>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>

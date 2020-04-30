@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Computer Vision Framework 3 - Image Segmentation</title>
+  <meta name="description" content="">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/11/07/vision3.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Computer Vision Framework 3 - Image Segmentation</h1>
+    <p class="artilce_meta"><time datetime="2019-11-07T00:00:00-05:00" itemprop="datePublished">Nov 7, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <!--description-->
+
+<p><a href="https://en.wikipedia.org/wiki/Image_segmentation">Image Segmentation</a> is a very broad category of image processing, but the basic idea is to separate various elements of an image into segments of a particular kind. In this project I will try out segmenting some images by pixel colors using <a href="https://en.wikipedia.org/wiki/K-means_clustering">k-means clustering</a>, and by so called "Superpixels" using a simplified version of the <a href="https://infoscience.epfl.ch/record/149300">SLIC</a> algorithm.</p>
+
+<p align="center">
+    <img src="/assets/img/cv3/SLIC_orig.png" />
+    <br />
+<font size="1">Superpixel Segmentation example from <a href="https://infoscience.epfl.ch/record/149300">SLIC Superpixels</a> (Radhakrishna <i>et al.</i>)</font>
+</p>
+
+<p><strong>Pre-processing</strong></p>
+
+<p>This was my first vision project dealing with RGB color channels instead of grayscale, so I had to decide how to deal with the extra layer of information. I initially chose to treat each channel as its own matrix and do every operation independently. While this made the code easy to think through and ultimately <i>worked</i>, it slowed things down immensely as it prevented vectorized code as well as introduced problems when converting back to output. I instead recommend keeping colors together as a multidimensional matrix when doing this.</p>
+
+<p><strong>K-means color segmentation</strong></p>
+
+<p>The idea here was to find 10 RGB values that are as close as possible to the RGB values of 10 clusters of pixels. In k-means terms these 10 RGB values are the centroids, and we need to find the closest pixels to those centroids and assign them the centroids RGB values once k means has converged. We ignored pixel locations and only considered colors for our clusters, which creates an effect of essentially reducing the image to 10 possible colors, similar to techniques that can be used for image compression. Here are the results on a sample image:</p>
+<p align="center">
+    <img src="/assets/img/cv3/white-tower.png" />
+    <br />output:<br />
+    <img src="/assets/img/cv3/white-tower-km.png" />
+</p>
+
+<p><strong>Simplified SLIC Superpixels</strong></p>
+
+<p>The goal of superpixels is to find pixels with common characteristics and put them into groups that are localized by location. Once found, this can be used for further image analysis or classification techniques such as object detection or semantic labeling without the complexity of analyzing all characteristics of each pixel individually. Furthermore, a superpixel contains much more visual information to work with compared to individual pixels, so you still have the flexibility of extracting that information when needed. The actual SLIC algorithm is fairly complex, so we did a simplified version. We start by choosing centers at chosen intervals, 50 pixels in our case, and then finding centroids and clusters by using the 5d space of RGB channels (3 dimensions) and x,y location (2 dimensions) This keeps the clusters in a relatively localized area while still shaping around the color and intensity of the pixels within them. Below is the output on a sample image with black borders drawn between each superpixel:</p>
+
+<p align="center">
+    <img src="/assets/img/cv3/slic_simple.png" />
+</p>
+
+<p>You can see that some superpixels have areas interspersed with neighboring superpixels. The full SLIC algorithm has some additional steps to prevent this, but this was enough to demonstrate the idea behind SLIC so we did not need to account for it in our simplified version.</p>
+
+<p>Most of the challenges in this program were in identifying the correct numpy math operations to deal with the multi-dimensional data. This involved a lot of trial and error while checking if I had used the correct operation, which was compounded by the fact that the runtime grew exponentially with image size. Due to this, I used a very small image to test with and made sure my IDE could read numpy matrices directly from debug mode. Here are a few specific issues I ran into:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Analysis</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Runtime was super long (hours)</td>
+      <td>Code was entirely sequential at first, which was easier to read and comprehend, but not optimal</td>
+      <td>Clustering operations are possible to do in parallel, or at least vectorized. Switched to vectorized code working on multi-dimensional arrays cut runtime by magnitudes</td>
+    </tr>
+    <tr>
+      <td>SNIC clusters were collapsing into top left section per iteration</td>
+      <td>Location metrics were supposed to be halved in magnitude when computing their distance, but this contributed to relative position to origin pixel 0,0 also being halved</td>
+      <td>Corrected iterations to maintain relative position and only halve the contribution to centroid distance.</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+<br /></p>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>

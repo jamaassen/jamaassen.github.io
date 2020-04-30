@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Computer Vision Framework 1 - Edge Detection</title>
+  <meta name="description" content="">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/09/25/vision1.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Computer Vision Framework 1 - Edge Detection</h1>
+    <p class="artilce_meta"><time datetime="2019-09-25T00:00:00-04:00" itemprop="datePublished">Sep 25, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <!--description-->
+
+<p>In image processing, Edge Detection is the process of extracting structural information from an image in order to identify the edges of objects in the image in order to reduce the amount of visual information that needs to be processed. The results are interesting in themselves, but it is mostly useful for it's applications within higher level vision algorithms that can use detected edges to help identify moved or similar objects in different images or frames. Our first project in Computer Vision was to implement a simplified version of the <a href="https://en.wikipedia.org/wiki/Canny_edge_detector">Canny Edge Detector</a> on a given grayscale image. The process was straightforward and mostly designed to make you familiar with the tools and methods you need to use to start doing image processing.</p>
+
+<p align="center">
+  <a href="https://en.wikipedia.org/wiki/Canny_edge_detector#/media/File:Valve_monochrome_canny_(6).PNG" title="Wikipedia image example">
+    <img src="/assets/img/cv1/wiki_canny_ex.png" alt="Wikipedia image example" width="450" />
+  </a>
+</p>
+
+<p>We consider our simplified edge detector to consist of the following steps:</p>
+
+<ol>
+  <li>Gaussian blur the image to reduce detection of edges on noise artifacts as well as change scope of edge detection</li>
+  <li>Compute the Gradient Magnitude of the image using Sobel filters, which we use as the basis of finding edges</li>
+  <li>Perform non-maximum suppression on the Gradient Magnitude, to form areas of large gradual change into a sharp defined edge</li>
+</ol>
+
+<p><strong>Pre-processing</strong></p>
+
+<p>Before we do any of that however, we need to get our image into a format that we can manipulate within Python. For the purposes of our project, we were not allowed to use most existing image libraries except for the task of reading the image into an array of pixels (and writing this array back out to an image).
+I chose to use <a href="https://pypi.org/project/Pillow/">Pillow</a> to import our provided pgm images and stored them as <a href="https://numpy.org/">numpy</a> matrices.
+I did encounter some minor issues with the image framework, which I will cover later.</p>
+
+<p><strong>Stage 1 - Gaussian Blur Filter</strong>
+Since this method of edge detection relies primarily on relative differences of pixel intensity for nearby pixels, image noise can greatly affect the output. Without Gaussian Blur, a single pixel of noise will be detected as a sharp edge. Furthermore, blurring an object can change the scope of object barriers to look at. As in, if you just want to see the edges of a large object, but not of the fine details of the objet, blurring it enough to remove those details will leave the large object edges. see how the edges of the details of the kangaroo disappear as we increase the area of the gaussian filter:</p>
+
+<p>sigma = 1:
+<img src="/assets/img/cv1/kang_s1.png" alt="alt text" title="kangaroo sigma=1" /></p>
+
+<p>sigma = 3
+<img src="/assets/img/cv1/kang_s3.png" alt="alt text" title="kangaroo sigma = 3" /></p>
+
+<p align="center">
+<img src="/assets/img/cv1/Gaussian.png" width="200" />  
+</p>
+
+<p align="center">
+(The equation used to calculate pixel intensities for the Gaussian filter.)
+</p>
+
+<p><strong>Stage 2 - Gradient Magnitude</strong>
+Now that the image is blurred, we begin the task of finding the pixels where rapid changes happen in some axis. The theory being that any pixel intensity change must correspond with the edge of some object. There are a couple of different filters we could use for this effect, but we choose Sobel's filter. After applying this filter on the an image such as:</p>
+
+<p><img src="/assets/img/cv1/plane.jpg" alt="this one" /></p>
+
+<p>we get this output:</p>
+
+<p><img src="/assets/img/cv1/plane_sm.png" alt="alt text" title="plane sobel magnitude" /></p>
+
+<p><strong>Stage 3 - Non-maximum Suppression</strong>
+You may notice that the output of the last step does not give us clearly defined edges for the most part, and instead provides various blurred smudge representations of edges. This is because in the source image the intensity change actually happens over many pixels. The idea of non-maximum suppression is for any given area of pixels, we only consider the pixel that represents the maximum amount of change in gradient (the highest intensity from the previous step)  and suppress the rest fo the neighboring pixels. This allows clear 1-pixel edges to become visible and cleans up the remains of what is left. Since we don’t do the additional step of the original Canny algorithm of tracing lines that likely connect, I instead chose to keep the relative intensity values of the maximum pixels, so that you can infer where lines might connect.
+Here is an example final output of the above plane:</p>
+
+<p><img src="/assets/img/cv1/plane_good_mag.png" alt="alt text" title="plane final" /></p>
+
+<p>This project was a nice intro into Computer Vision algorithms, here are some if the issues that came up during development:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Analysis</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Images were all black or all white, despite pixel data in the array looking correct</td>
+      <td>PGM uses 8-bit ints for pixel data, data types were changing due to float operations and not scaling correctly when put back out to pgm format</td>
+      <td>Created a wrapper function on image output to warn of changed data type or bad data scale which also converted when needed. Also manually scaled and corrected data types where needed.</td>
+    </tr>
+    <tr>
+      <td>Gaussian blur output was noticeably higher intensity(brighter) than original image.</td>
+      <td>Normalization factor was off for certain pixel widths</td>
+      <td>Added an auto-scaling normalization factory that adjusted per filter size.</td>
+    </tr>
+    <tr>
+      <td>Final stage line intensities appeared to be random, not correlated with actual intensity of gradient magnitude <img src="/assets/img/cv1/plane_bad_mag.png" alt="alt text" title="plane with bad magnitude " /></td>
+      <td>Was using the gradient intensity of the axis with the highest value instead of the overall pixel gradient magnitude accounting for all axis leading to problems when there was large variation between axes</td>
+      <td>Once an edge is found by analyzing the maximum axis, use the total gradient magnitude as the intensity to represent the pixel</td>
+    </tr>
+  </tbody>
+</table>
+
+<p><br />
+<br /></p>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>
