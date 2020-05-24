@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>SQL database project - Extended multi-feature query processing engine</title>
+  <meta name="description" content="The ProblemWith standard SQL, building and maintaining multi-dimensional queries is a challenge for multiple reasons:The language does not allow succinct rep...">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/12/07/SQL.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">SQL database project - Extended multi-feature query processing engine</h1>
+    <p class="artilce_meta"><time datetime="2019-12-07T00:00:00-05:00" itemprop="datePublished">Dec 7, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <p><strong>The Problem</strong>
+With standard SQL, building and maintaining multi-dimensional queries is a challenge for multiple reasons:
+The language does not allow succinct representation of simple concepts such as Data pivots, aggregate functions over multiple groups of the same table, and hierarchical data comparisons.
+Optimization suffers for it. In order to represent most multi-dimensional queries, we must resort to a complicated and costly series of join operations across many different relational algebra operators and multiple sub-queries. This makes it difficult for a query engine to optimize it without costly analysis, which is not feasible for ad-hoc queries.
+<!--description--></p>
+
+<p><strong>The Solution: Extended SQL</strong>
+Extended SQL and Multi Feature Queries were originally developed by Chatziantoniou et al across two publications: <a href="https://www.semanticscholar.org/paper/Querying-Multiple-Features-of-Groups-in-Relational-Chatziantoniou-Ross/ace30b5576f6c5f57bd9cffd8c738e47c43b00c1">Querying Multiple Features of Groups in Relational Databases</a> and <a href="https://www.semanticscholar.org/paper/Evaluation-of-ad-hoc-OLAP%3A-in-place-computation-Chatziantoniou/f7da51d6ce41170b88e2631a7060411a4881ea7b">Evaluation of ad hoc OLAP: in-place computation</a>. The papers describe a syntax that allows succinct expression of the types of queries queries mentioned above. This benefits us in a number of ways:</p>
+<ul>
+  <li>Easier for humans to understand and formulate: Less likely for bugs to occur and less difficult to maintain</li>
+  <li>Fewer costly join operations needed from the beginning: Leading to faster processing even before further optimization</li>
+  <li>More feasible to optimize: With the query represented by grouping variables and the Phi relational algebra operator, it does not require as much deep analysis to optimize the query in order to improve the processing time.</li>
+</ul>
+
+<p><strong>My Implementation</strong>
+I created both an MF and EMF based query processing engine that takes queries constructed with the Phi operator (see details in the above publications) and generates python code that executes this query. 
+During execution, the MF table is a series of nested default dictionaries.</p>
+
+<ul>
+  <li>1st level: Scan # (table scan pass)</li>
+  <li>2nd level: grouping attributes</li>
+  <li>3rd level: attribute we are aggregating</li>
+  <li>4th level: aggregate function
+    <font size="2">(this is a Custom defaultdict made especially for storing aggregates where default values for min, max, and avg are Null and all others are 0.)</font>
+  </li>
+</ul>
+
+<p>This allows us to not waste space or time on attributes or aggregate functions that are not used in this query, while still allowing fast access of any possible attributes or aggregates needed.</p>
+
+<p>At a high level, the basic steps are as follows:</p>
+<ol>
+  <li>Parse the query data</li>
+  <li>Inject code for each grouping variable matching given conditions - One table scan per grouping variable, maintain aggregates of each.</li>
+  <li>Inject code to Build the output, scanning through all found grouping attributes for valid rows</li>
+</ol>
+
+<p>Overall Engine logic:</p>
+<p align="center">
+    <img src="/assets/img/sql/workflow.svg" width="5000" />
+</p>
+
+<p>This was a fun and challenging project. It was the first time I created code that then created other code so it was interesting coming up with good ways to manage that. Here are some specific challenges I dealt with along the way:</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Analysis</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>I originally tried to generate everything about the output code structure in the processing engine first</td>
+      <td>This led to a lot of syntax and logic issues while debugging that were tedious to identify and correct</td>
+      <td>Instead, I created my output code by hand, keeping in mind which parts needed to be modular, then worked backwards to make the engine output that code</td>
+    </tr>
+    <tr>
+      <td>Expected outputs were missing on sparse data</td>
+      <td>Null results were not being detected correctly</td>
+      <td>Switched to using try/except for all condition checks to avoid special logic for detecting Null cases.</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>

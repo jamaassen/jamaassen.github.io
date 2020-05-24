@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Wed, 29 Apr 2020 21:01:24 -0400</pubDate>
-    <lastBuildDate>Wed, 29 Apr 2020 21:01:24 -0400</lastBuildDate>
+    <pubDate>Sun, 24 May 2020 17:52:11 -0400</pubDate>
+    <lastBuildDate>Sun, 24 May 2020 17:52:11 -0400</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
@@ -55,6 +55,82 @@ Therefore, if reduced memory usage and complexity are goals, SNIC is a good choi
         <pubDate>Tue, 17 Dec 2019 00:00:00 -0500</pubDate>
         <link>http://localhost:4000/academic/2019/12/17/vision5.html</link>
         <guid isPermaLink="true">http://localhost:4000/academic/2019/12/17/vision5.html</guid>
+        
+        
+        <category>Academic</category>
+        
+      </item>
+    
+      <item>
+        <title>SQL database project - Extended multi-feature query processing engine</title>
+        <description>&lt;p&gt;&lt;strong&gt;The Problem&lt;/strong&gt;
+With standard SQL, building and maintaining multi-dimensional queries is a challenge for multiple reasons:
+The language does not allow succinct representation of simple concepts such as Data pivots, aggregate functions over multiple groups of the same table, and hierarchical data comparisons.
+Optimization suffers for it. In order to represent most multi-dimensional queries, we must resort to a complicated and costly series of join operations across many different relational algebra operators and multiple sub-queries. This makes it difficult for a query engine to optimize it without costly analysis, which is not feasible for ad-hoc queries.
+&lt;!--description--&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;The Solution: Extended SQL&lt;/strong&gt;
+Extended SQL and Multi Feature Queries were originally developed by Chatziantoniou et al across two publications: &lt;a href=&quot;https://www.semanticscholar.org/paper/Querying-Multiple-Features-of-Groups-in-Relational-Chatziantoniou-Ross/ace30b5576f6c5f57bd9cffd8c738e47c43b00c1&quot;&gt;Querying Multiple Features of Groups in Relational Databases&lt;/a&gt; and &lt;a href=&quot;https://www.semanticscholar.org/paper/Evaluation-of-ad-hoc-OLAP%3A-in-place-computation-Chatziantoniou/f7da51d6ce41170b88e2631a7060411a4881ea7b&quot;&gt;Evaluation of ad hoc OLAP: in-place computation&lt;/a&gt;. The papers describe a syntax that allows succinct expression of the types of queries queries mentioned above. This benefits us in a number of ways:&lt;/p&gt;
+&lt;ul&gt;
+  &lt;li&gt;Easier for humans to understand and formulate: Less likely for bugs to occur and less difficult to maintain&lt;/li&gt;
+  &lt;li&gt;Fewer costly join operations needed from the beginning: Leading to faster processing even before further optimization&lt;/li&gt;
+  &lt;li&gt;More feasible to optimize: With the query represented by grouping variables and the Phi relational algebra operator, it does not require as much deep analysis to optimize the query in order to improve the processing time.&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;&lt;strong&gt;My Implementation&lt;/strong&gt;
+I created both an MF and EMF based query processing engine that takes queries constructed with the Phi operator (see details in the above publications) and generates python code that executes this query. 
+During execution, the MF table is a series of nested default dictionaries.&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;1st level: Scan # (table scan pass)&lt;/li&gt;
+  &lt;li&gt;2nd level: grouping attributes&lt;/li&gt;
+  &lt;li&gt;3rd level: attribute we are aggregating&lt;/li&gt;
+  &lt;li&gt;4th level: aggregate function
+    &lt;font size=&quot;2&quot;&gt;(this is a Custom defaultdict made especially for storing aggregates where default values for min, max, and avg are Null and all others are 0.)&lt;/font&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;This allows us to not waste space or time on attributes or aggregate functions that are not used in this query, while still allowing fast access of any possible attributes or aggregates needed.&lt;/p&gt;
+
+&lt;p&gt;At a high level, the basic steps are as follows:&lt;/p&gt;
+&lt;ol&gt;
+  &lt;li&gt;Parse the query data&lt;/li&gt;
+  &lt;li&gt;Inject code for each grouping variable matching given conditions - One table scan per grouping variable, maintain aggregates of each.&lt;/li&gt;
+  &lt;li&gt;Inject code to Build the output, scanning through all found grouping attributes for valid rows&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;Overall Engine logic:&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/sql/workflow.svg&quot; width=&quot;5000&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;This was a fun and challenging project. It was the first time I created code that then created other code so it was interesting coming up with good ways to manage that. Here are some specific challenges I dealt with along the way:&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Problem&lt;/th&gt;
+      &lt;th&gt;Analysis&lt;/th&gt;
+      &lt;th&gt;Solution&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;I originally tried to generate everything about the output code structure in the processing engine first&lt;/td&gt;
+      &lt;td&gt;This led to a lot of syntax and logic issues while debugging that were tedious to identify and correct&lt;/td&gt;
+      &lt;td&gt;Instead, I created my output code by hand, keeping in mind which parts needed to be modular, then worked backwards to make the engine output that code&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Expected outputs were missing on sparse data&lt;/td&gt;
+      &lt;td&gt;Null results were not being detected correctly&lt;/td&gt;
+      &lt;td&gt;Switched to using try/except for all condition checks to avoid special logic for detecting Null cases.&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+</description>
+        <pubDate>Sat, 07 Dec 2019 00:00:00 -0500</pubDate>
+        <link>http://localhost:4000/academic/2019/12/07/SQL.html</link>
+        <guid isPermaLink="true">http://localhost:4000/academic/2019/12/07/SQL.html</guid>
         
         
         <category>Academic</category>
