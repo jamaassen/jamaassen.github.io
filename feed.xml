@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 24 May 2020 17:52:11 -0400</pubDate>
-    <lastBuildDate>Sun, 24 May 2020 17:52:11 -0400</lastBuildDate>
+    <pubDate>Sun, 24 May 2020 20:39:04 -0400</pubDate>
+    <lastBuildDate>Sun, 24 May 2020 20:39:04 -0400</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
@@ -63,22 +63,23 @@ Therefore, if reduced memory usage and complexity are goals, SNIC is a good choi
     
       <item>
         <title>SQL database project - Extended multi-feature query processing engine</title>
-        <description>&lt;p&gt;&lt;strong&gt;The Problem&lt;/strong&gt;
-With standard SQL, building and maintaining multi-dimensional queries is a challenge for multiple reasons:
-The language does not allow succinct representation of simple concepts such as Data pivots, aggregate functions over multiple groups of the same table, and hierarchical data comparisons.
-Optimization suffers for it. In order to represent most multi-dimensional queries, we must resort to a complicated and costly series of join operations across many different relational algebra operators and multiple sub-queries. This makes it difficult for a query engine to optimize it without costly analysis, which is not feasible for ad-hoc queries.
+        <description>&lt;p&gt;&lt;strong&gt;The Problem with Standard SQL:&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Building and maintaining multi-dimensional queries is a challenge for multiple reasons. The language does not allow succinct representation of simple concepts such as Data pivots, aggregate functions over multiple groups of the same table, and hierarchical data comparisons. In order to represent most multi-dimensional queries, we must resort to a complicated and costly series of join operations across many different relational algebra operators and multiple sub-queries. Besides the extra confusion of how to actually build the query, This makes it difficult for a query engine to optimize without costly analysis, which is not feasible for ad-hoc queries.
 &lt;!--description--&gt;&lt;/p&gt;
 
-&lt;p&gt;&lt;strong&gt;The Solution: Extended SQL&lt;/strong&gt;
-Extended SQL and Multi Feature Queries were originally developed by Chatziantoniou et al across two publications: &lt;a href=&quot;https://www.semanticscholar.org/paper/Querying-Multiple-Features-of-Groups-in-Relational-Chatziantoniou-Ross/ace30b5576f6c5f57bd9cffd8c738e47c43b00c1&quot;&gt;Querying Multiple Features of Groups in Relational Databases&lt;/a&gt; and &lt;a href=&quot;https://www.semanticscholar.org/paper/Evaluation-of-ad-hoc-OLAP%3A-in-place-computation-Chatziantoniou/f7da51d6ce41170b88e2631a7060411a4881ea7b&quot;&gt;Evaluation of ad hoc OLAP: in-place computation&lt;/a&gt;. The papers describe a syntax that allows succinct expression of the types of queries queries mentioned above. This benefits us in a number of ways:&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;The Solution: Extended SQL&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;Extended SQL and Multi Feature Queries were originally developed by Chatziantoniou et al across two publications: &lt;a href=&quot;https://www.semanticscholar.org/paper/Querying-Multiple-Features-of-Groups-in-Relational-Chatziantoniou-Ross/ace30b5576f6c5f57bd9cffd8c738e47c43b00c1&quot;&gt;Querying Multiple Features of Groups in Relational Databases&lt;/a&gt; and &lt;a href=&quot;https://www.semanticscholar.org/paper/Evaluation-of-ad-hoc-OLAP%3A-in-place-computation-Chatziantoniou/f7da51d6ce41170b88e2631a7060411a4881ea7b&quot;&gt;Evaluation of ad hoc OLAP: in-place computation&lt;/a&gt;. The papers describe a syntax that allows succinct expression of the types of queries queries mentioned above. This benefits us in a number of ways:&lt;/p&gt;
 &lt;ul&gt;
   &lt;li&gt;Easier for humans to understand and formulate: Less likely for bugs to occur and less difficult to maintain&lt;/li&gt;
   &lt;li&gt;Fewer costly join operations needed from the beginning: Leading to faster processing even before further optimization&lt;/li&gt;
   &lt;li&gt;More feasible to optimize: With the query represented by grouping variables and the Phi relational algebra operator, it does not require as much deep analysis to optimize the query in order to improve the processing time.&lt;/li&gt;
 &lt;/ul&gt;
 
-&lt;p&gt;&lt;strong&gt;My Implementation&lt;/strong&gt;
-I created both an MF and EMF based query processing engine that takes queries constructed with the Phi operator (see details in the above publications) and generates python code that executes this query. 
+&lt;p&gt;&lt;strong&gt;My Implementation&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;I created both an MF and EMF based query processing engine that takes queries constructed with the Phi operator (see details in the above publications) and generates python code that executes this query. 
 During execution, the MF table is a series of nested default dictionaries.&lt;/p&gt;
 
 &lt;ul&gt;
