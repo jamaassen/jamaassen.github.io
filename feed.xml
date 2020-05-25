@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 24 May 2020 20:39:04 -0400</pubDate>
-    <lastBuildDate>Sun, 24 May 2020 20:39:04 -0400</lastBuildDate>
+    <pubDate>Sun, 24 May 2020 23:00:57 -0400</pubDate>
+    <lastBuildDate>Sun, 24 May 2020 23:00:57 -0400</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
@@ -458,6 +458,45 @@ Here is an example final output of the above plane:&lt;/p&gt;
         <pubDate>Wed, 25 Sep 2019 00:00:00 -0400</pubDate>
         <link>http://localhost:4000/academic/2019/09/25/vision1.html</link>
         <guid isPermaLink="true">http://localhost:4000/academic/2019/09/25/vision1.html</guid>
+        
+        
+        <category>Academic</category>
+        
+      </item>
+    
+      <item>
+        <title>Data Structures project - Treap implementation in Java</title>
+        <description>&lt;p&gt;A &lt;a href=&quot;https://en.wikipedia.org/wiki/Treap&quot;&gt;Treap&lt;/a&gt; is a pseudo auto-balanced Binary search Tree (BST), also referred to as a &lt;a href=&quot;https://en.wikipedia.org/wiki/Self-balancing_binary_search_tree&quot;&gt;Self-balancing BST&lt;/a&gt; . It utilizes randomized heap priorities assigned to each new node added to a BST follow by heapify operations in order to attempt to keep the BST balanced. Since it relies on random operations, it is not quite as guaranteed to be balanced as other auto balancing BSTs such as &lt;a href=&quot;https://en.wikipedia.org/wiki/Red%E2%80%93black_tree&quot;&gt;red-black trees&lt;/a&gt; or &lt;a href=&quot;https://en.wikipedia.org/wiki/AVL_tree&quot;&gt;AVL trees&lt;/a&gt;, but over enough operations it will statistically perform just as well without all the extra complicated logic that these types of tree entail.&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/ds/treap.png&quot; height=&quot;200&quot; /&gt;
+    &lt;br /&gt;
+&lt;font size=&quot;1&quot;&gt;Treap example from &lt;a href=&quot;https://www.geeksforgeeks.org/treap-a-randomized-binary-search-tree/&quot;&gt;GeeksforGeeks.org&lt;/a&gt;&lt;/font&gt;
+&lt;/p&gt;
+&lt;!--description--&gt;
+
+&lt;p&gt;There are two basic concepts that make a Treap possible. In order to maintain heap priorities in a binary heap (which must have any parent node heap priority larger than its children), we must be able to push a node up the tree until it is higher than all its children.  In order to move a node up a tree without violating the BST properties, we use node rotation, where any 3 nodes (parent and 1-2 children) in a BST can be rotated in a way that maintains their BST order, but ends up with one of the children nodes now as the parent. Thus, whenever we add a node into a Treap, we first do a standard BST insert based on the given node data, keeping track of the path traversed to do so. Then we then rotate it up the path until the randomly assigned heap priority no longer violates heap rules.&lt;/p&gt;
+
+&lt;p&gt;For my advanced data structures project, we had to implement to implement a Treap in Java from scratch in a way to take any comparable object (and therefore able to be stored in a BST) as the data object for each node.&lt;/p&gt;
+
+&lt;p&gt;To do this I simply use &lt;a href=&quot;https://en.wikipedia.org/wiki/Generics_in_Java&quot;&gt;Java Generics&lt;/a&gt; to define the data object as &lt;code class=&quot;highlighter-rouge&quot;&gt;public class Treap&amp;lt;E extends Comparable&amp;lt;E&amp;gt;&amp;gt;&lt;/code&gt;&lt;/p&gt;
+
+&lt;p&gt;Furthermore, instead of the recursive version of adding and deleting a node, we needed to do an iterative version. To do this I maintained a stack of the path taken to add a node, and then passed this stack to a reheap function in order to restore/maintain the proper heap properties.&lt;/p&gt;
+
+&lt;p&gt;This also complicated the rotate functions, as the parent node of the 3 nodes we are rotating around was not easily accessible. Thus, In order to avoid extra logic to find and alter these links, I just swapped data objects and heap priorities within the existing nodes, which maintained their parent and children links. Then moved around the other links as needed.&lt;/p&gt;
+
+&lt;p&gt;Here is a visual representation demonstrating my RotateRight method. Here we need to rotate the A node up, since it has a higher priority (62) than the B node (53):&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/ds/RotateRight.svg&quot; width=&quot;800&quot; /&gt;
+&lt;/p&gt;
+
+&lt;p&gt;You can see this works with or without any actual node in the C position and only modifies the links of nodes directly involved in the rotation operation.&lt;/p&gt;
+
+&lt;p&gt;The rest of the implementation is fairly straightforward combinations of binary heap and BST operations.  For more details see the wikipedia or geeksforgeeks page on either.&lt;/p&gt;
+</description>
+        <pubDate>Fri, 26 Apr 2019 00:00:00 -0400</pubDate>
+        <link>http://localhost:4000/academic/2019/04/26/Treap.html</link>
+        <guid isPermaLink="true">http://localhost:4000/academic/2019/04/26/Treap.html</guid>
         
         
         <category>Academic</category>

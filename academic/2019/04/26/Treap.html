@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Data Structures project - Treap implementation in Java</title>
+  <meta name="description" content="A Treap is a pseudo auto-balanced Binary search Tree (BST), also referred to as a Self-balancing BST . It utilizes randomized heap priorities assigned to eac...">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/04/26/Treap.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Data Structures project - Treap implementation in Java</h1>
+    <p class="artilce_meta"><time datetime="2019-04-26T00:00:00-04:00" itemprop="datePublished">Apr 26, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <p>A <a href="https://en.wikipedia.org/wiki/Treap">Treap</a> is a pseudo auto-balanced Binary search Tree (BST), also referred to as a <a href="https://en.wikipedia.org/wiki/Self-balancing_binary_search_tree">Self-balancing BST</a> . It utilizes randomized heap priorities assigned to each new node added to a BST follow by heapify operations in order to attempt to keep the BST balanced. Since it relies on random operations, it is not quite as guaranteed to be balanced as other auto balancing BSTs such as <a href="https://en.wikipedia.org/wiki/Red%E2%80%93black_tree">red-black trees</a> or <a href="https://en.wikipedia.org/wiki/AVL_tree">AVL trees</a>, but over enough operations it will statistically perform just as well without all the extra complicated logic that these types of tree entail.</p>
+<p align="center">
+    <img src="/assets/img/ds/treap.png" height="200" />
+    <br />
+<font size="1">Treap example from <a href="https://www.geeksforgeeks.org/treap-a-randomized-binary-search-tree/">GeeksforGeeks.org</a></font>
+</p>
+<!--description-->
+
+<p>There are two basic concepts that make a Treap possible. In order to maintain heap priorities in a binary heap (which must have any parent node heap priority larger than its children), we must be able to push a node up the tree until it is higher than all its children.  In order to move a node up a tree without violating the BST properties, we use node rotation, where any 3 nodes (parent and 1-2 children) in a BST can be rotated in a way that maintains their BST order, but ends up with one of the children nodes now as the parent. Thus, whenever we add a node into a Treap, we first do a standard BST insert based on the given node data, keeping track of the path traversed to do so. Then we then rotate it up the path until the randomly assigned heap priority no longer violates heap rules.</p>
+
+<p>For my advanced data structures project, we had to implement to implement a Treap in Java from scratch in a way to take any comparable object (and therefore able to be stored in a BST) as the data object for each node.</p>
+
+<p>To do this I simply use <a href="https://en.wikipedia.org/wiki/Generics_in_Java">Java Generics</a> to define the data object as <code class="highlighter-rouge">public class Treap&lt;E extends Comparable&lt;E&gt;&gt;</code></p>
+
+<p>Furthermore, instead of the recursive version of adding and deleting a node, we needed to do an iterative version. To do this I maintained a stack of the path taken to add a node, and then passed this stack to a reheap function in order to restore/maintain the proper heap properties.</p>
+
+<p>This also complicated the rotate functions, as the parent node of the 3 nodes we are rotating around was not easily accessible. Thus, In order to avoid extra logic to find and alter these links, I just swapped data objects and heap priorities within the existing nodes, which maintained their parent and children links. Then moved around the other links as needed.</p>
+
+<p>Here is a visual representation demonstrating my RotateRight method. Here we need to rotate the A node up, since it has a higher priority (62) than the B node (53):</p>
+
+<p align="center">
+    <img src="/assets/img/ds/RotateRight.svg" width="800" />
+</p>
+
+<p>You can see this works with or without any actual node in the C position and only modifies the links of nodes directly involved in the rotation operation.</p>
+
+<p>The rest of the implementation is fairly straightforward combinations of binary heap and BST operations.  For more details see the wikipedia or geeksforgeeks page on either.</p>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>
