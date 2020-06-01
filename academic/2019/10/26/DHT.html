@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Cloud Systems project - Distributed Hash Table Network</title>
+  <meta name="description" content="Chord is a peer-to-peer (p2p) protocol designed to maintain a distributed hash table. It primarily works by having each node in a network maintain a partial ...">
+
+  <!-- evil icon -->
+
+  <link rel="stylesheet" href="/assets/evil-icons.min.css">
+  <script src="/assets/evil-icons.min.js"></script>
+
+  <!-- todo: include this into main.css -->
+
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="canonical" href="http://localhost:4000/academic/2019/10/26/DHT.html">
+  <link rel="alternate" type="application/rss+xml" title="Jeffrey Maassen" href="http://localhost:4000/feed.xml">
+</head>
+
+  <body>
+    <div class="page-content">
+      <div class="container">
+        <div class="three columns">
+          <header class="site-header">
+
+  <h2 class="logo"><a href="/">Jeffrey Maassen</a></h2>
+
+  <div class="nav">
+    
+    <label for="menu-toggle" class="menu-icon">
+        <!--div data-icon="ei-navicon"></div-->
+        <svg viewBox="0 0 18 15">
+          <path fill="#424242" d="M18,1.484c0,0.82-0.665,1.484-1.484,1.484H1.484C0.665,2.969,0,2.304,0,1.484l0,0C0,0.665,0.665,0,1.484,0 h15.031C17.335,0,18,0.665,18,1.484L18,1.484z"/>
+          <path fill="#424242" d="M18,7.516C18,8.335,17.335,9,16.516,9H1.484C0.665,9,0,8.335,0,7.516l0,0c0-0.82,0.665-1.484,1.484-1.484 h15.031C17.335,6.031,18,6.696,18,7.516L18,7.516z"/>
+          <path fill="#424242" d="M18,13.516C18,14.335,17.335,15,16.516,15H1.484C0.665,15,0,14.335,0,13.516l0,0 c0-0.82,0.665-1.484,1.484-1.484h15.031C17.335,12.031,18,12.696,18,13.516L18,13.516z"/>
+        </svg>
+    </label>
+    <input type="checkbox" id="menu-toggle">
+
+    <div class="site-nav">
+      <nav>
+        <ul class="page-link">
+          <li><a href="/">Home</a></li>
+          <li><a href="/archive">Projects</a></li>
+          <li><a href="/about">About</a></li>
+        </ul>
+      </nav>
+    </div>
+
+  </div>
+</header>
+
+        </div>
+
+        <div class="nine columns" style="z-index:100;">
+          <div class="wrapper">
+            <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+
+  <header class="artilce_header">
+    <h1 class="artilce_title" itemprop="name headline">Cloud Systems project - Distributed Hash Table Network</h1>
+    <p class="artilce_meta"><time datetime="2019-10-26T00:00:00-04:00" itemprop="datePublished">Oct 26, 2019</time></p>
+  </header>
+
+  <div class="article-content" itemprop="articleBody">
+    <p><a href="https://en.wikipedia.org/wiki/Chord_(peer-to-peer)">Chord</a> is a peer-to-peer (p2p) protocol designed to maintain a distributed hash table. It primarily works by having each node in a network maintain a partial set of key-values pairs as well as a list of distributed nodes (known as a finger table) at strategic distributions of the network. It also constantly checks and updates the status of the network to maintain connectivity across potentially unreliable p2p nodes.</p>
+
+<p>For our Cloud and Distributed Systems project, we needed to implement a Chord-based distributed network in Java that establishes and maintains connections using RESTful APIs as well as supports remote shell operation of other nodes via websockets.</p>
+
+<p align="center">
+    <img src="/assets/img/dht/Chord_network.png" height="200" />
+    <br />
+<font size="1">Chord network example with finger nodes highlighted from <a href="https://en.wikipedia.org/wiki/Chord_(peer-to-peer)#/media/File:Chord_network.png">Wikipedia.org</a></font>
+</p>
+<!--description-->
+
+<p>Our project went in three phases. For the first phase we focused on using REST to connect, coordinate, and maintain Chord DHT nodes. Here is an overview of the structure of phase 1:</p>
+<p align="center">
+    <img src="/assets/img/dht/structure.png" height="200" />
+</p>
+<p>To implement REST we used the <a href="https://eclipse-ee4j.github.io/jersey/">Jersey</a> framework which provides full support for <a href="https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services">JAX-RS APIs</a>. Each node uses an embedded <a href="https://javaee.github.io/grizzly/">Grizzly</a> web server to listen for and send REST calls.</p>
+
+<p>Chord's underlying logic relies on the idea of each node maintaining <a href="https://en.wikipedia.org/wiki/Chord_(peer-to-peer)#Finger_table">finger tables</a>. These tables contains lists of nodes that are varying powers of 2 away from the current node, which allows you to reach a target node within O(log N) hops from any given node.</p>
+<p align="center">
+    <img src="/assets/img/dht/finger_table.png" height="200" />
+    <br />
+<font size="1">Visual representation of node distances that are maintained in a finger table</font>
+</p>
+
+<p>These tables are maintained by various GET and PUT operations from each node. while GET, PUT and DELETE are used to actually add, update, or remove key value pairs at any given node.</p>
+
+<p>For the 2nd phase we implemented Server-Sent Events (<a href="https://docs.huihoo.com/jersey/2.24/sse.html">SSE</a>) with Jersey in order to let the CLI from one node register to listen for incoming pushed events such as new or updated key/value bindings from another node. We also had to make sure nodes could fully communicate across independent networks, which meant confirming IP address routing and port usage for all protocols.</p>
+
+<p>For phase 3, we added <a href="https://docs.oracle.com/javaee/7/api/javax/websocket/package-summary.html">Websockets</a> to allow a local CLI shell to remotely control a remote CLI shell. The websocket essentially just intercepted data that was being passed between the local CLI and backbend process and instead sends it through the websocket. As an added challenge we needed to maintain a stack of existing websockets to enable us to remember which node we were on before establishing a new websocket remote shell.</p>
+
+<p>This project was a great introduction to many core distributed systems principles. The majority of the issues with implementing it came down to becoming familiar with the APIs and frameworks that we had to use.</p>
+
+<table>
+  <thead>
+    <tr>
+      <th>Problem</th>
+      <th>Analysis</th>
+      <th>Solution</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>RESTful PUT commands kept giving server errors, but only on certain requests</td>
+      <td>PUT requires an entity to be included with an explicit data type, both server and client must agree on the data format</td>
+      <td>made sure to explicitly designate what data formats were being sent and received for PUT commands. Also made sure there was always an entity included in the command</td>
+    </tr>
+    <tr>
+      <td>Websocket remote control was losing context for local shell after closing all remote connections</td>
+      <td>Connection closing logic was killing entire shell when there were no more valid connections</td>
+      <td>Added extra CLI logic to handle return to local shell and trying to kill connection of a local shell</td>
+    </tr>
+  </tbody>
+</table>
+
+  </div>
+
+<!--   <footer class="article-footer">
+
+  <section class="share">
+  <a class="share-link" href="" onclick="window.open(this.href, 'twitter-share', 'width=550,height=235');return false;">
+    Twitter
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'facebook-share','width=580,height=296');return false;">
+    Facebook
+  </a>
+  <a class="share-link" href="" onclick="window.open(this.href, 'google-plus-share', 'width=490,height=530'); return false;">
+    Google+
+  </a> 
+</section>
+
+
+  <hr/>
+
+  <section class="author">
+  <div class="authorimage box" style="background: url(/assets/img/Taffy.jpg)"></div>
+  <div class="authorinfo box">
+    <p>Author | David Lin</p>
+    <p class="bio">
+      Currently a Ph.D. student in Singapore University of Technology and Design in the area of Human-Computer Interaction(HCI).
+    </p>
+  </div>
+</section>
+
+
+  </footer> -->
+
+  
+
+
+</article>
+
+          </div>
+        </div>
+      </div>
+      <footer class="site-footer">
+  <div class="container">
+    <div class="footer left column one-half">
+      <section class="small-font">
+        Theme <a href="https://github.com/wild-flame/jekyll-simple"> Simple </a> by <a href="http://wildflame.me">wildflame</a>
+        © 2016 
+        Powered by <a href="https://github.com/jekyll/jekyll">jekyll</a>
+      </section>
+    </div>
+
+    <div class="footer right column one-half">
+      <section class="small-font">
+        
+        
+      </section>
+    </div>
+  </div>
+</footer>
+ 
+    </div>
+  </body>
+</html>

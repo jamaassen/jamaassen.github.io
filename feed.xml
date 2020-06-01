@@ -6,8 +6,8 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 24 May 2020 23:00:57 -0400</pubDate>
-    <lastBuildDate>Sun, 24 May 2020 23:00:57 -0400</lastBuildDate>
+    <pubDate>Sun, 31 May 2020 20:02:40 -0400</pubDate>
+    <lastBuildDate>Sun, 31 May 2020 20:02:40 -0400</lastBuildDate>
     <generator>Jekyll v4.0.0</generator>
     
       <item>
@@ -277,6 +277,71 @@ I also tried various bin sizes. The best seems to be around 7-10 bins with the a
         <pubDate>Thu, 07 Nov 2019 00:00:00 -0500</pubDate>
         <link>http://localhost:4000/academic/2019/11/07/vision3.html</link>
         <guid isPermaLink="true">http://localhost:4000/academic/2019/11/07/vision3.html</guid>
+        
+        
+        <category>Academic</category>
+        
+      </item>
+    
+      <item>
+        <title>Cloud Systems project - Distributed Hash Table Network</title>
+        <description>&lt;p&gt;&lt;a href=&quot;https://en.wikipedia.org/wiki/Chord_(peer-to-peer)&quot;&gt;Chord&lt;/a&gt; is a peer-to-peer (p2p) protocol designed to maintain a distributed hash table. It primarily works by having each node in a network maintain a partial set of key-values pairs as well as a list of distributed nodes (known as a finger table) at strategic distributions of the network. It also constantly checks and updates the status of the network to maintain connectivity across potentially unreliable p2p nodes.&lt;/p&gt;
+
+&lt;p&gt;For our Cloud and Distributed Systems project, we needed to implement a Chord-based distributed network in Java that establishes and maintains connections using RESTful APIs as well as supports remote shell operation of other nodes via websockets.&lt;/p&gt;
+
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/dht/Chord_network.png&quot; height=&quot;200&quot; /&gt;
+    &lt;br /&gt;
+&lt;font size=&quot;1&quot;&gt;Chord network example with finger nodes highlighted from &lt;a href=&quot;https://en.wikipedia.org/wiki/Chord_(peer-to-peer)#/media/File:Chord_network.png&quot;&gt;Wikipedia.org&lt;/a&gt;&lt;/font&gt;
+&lt;/p&gt;
+&lt;!--description--&gt;
+
+&lt;p&gt;Our project went in three phases. For the first phase we focused on using REST to connect, coordinate, and maintain Chord DHT nodes. Here is an overview of the structure of phase 1:&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/dht/structure.png&quot; height=&quot;200&quot; /&gt;
+&lt;/p&gt;
+&lt;p&gt;To implement REST we used the &lt;a href=&quot;https://eclipse-ee4j.github.io/jersey/&quot;&gt;Jersey&lt;/a&gt; framework which provides full support for &lt;a href=&quot;https://en.wikipedia.org/wiki/Java_API_for_RESTful_Web_Services&quot;&gt;JAX-RS APIs&lt;/a&gt;. Each node uses an embedded &lt;a href=&quot;https://javaee.github.io/grizzly/&quot;&gt;Grizzly&lt;/a&gt; web server to listen for and send REST calls.&lt;/p&gt;
+
+&lt;p&gt;Chord's underlying logic relies on the idea of each node maintaining &lt;a href=&quot;https://en.wikipedia.org/wiki/Chord_(peer-to-peer)#Finger_table&quot;&gt;finger tables&lt;/a&gt;. These tables contains lists of nodes that are varying powers of 2 away from the current node, which allows you to reach a target node within O(log N) hops from any given node.&lt;/p&gt;
+&lt;p align=&quot;center&quot;&gt;
+    &lt;img src=&quot;/assets/img/dht/finger_table.png&quot; height=&quot;200&quot; /&gt;
+    &lt;br /&gt;
+&lt;font size=&quot;1&quot;&gt;Visual representation of node distances that are maintained in a finger table&lt;/font&gt;
+&lt;/p&gt;
+
+&lt;p&gt;These tables are maintained by various GET and PUT operations from each node. while GET, PUT and DELETE are used to actually add, update, or remove key value pairs at any given node.&lt;/p&gt;
+
+&lt;p&gt;For the 2nd phase we implemented Server-Sent Events (&lt;a href=&quot;https://docs.huihoo.com/jersey/2.24/sse.html&quot;&gt;SSE&lt;/a&gt;) with Jersey in order to let the CLI from one node register to listen for incoming pushed events such as new or updated key/value bindings from another node. We also had to make sure nodes could fully communicate across independent networks, which meant confirming IP address routing and port usage for all protocols.&lt;/p&gt;
+
+&lt;p&gt;For phase 3, we added &lt;a href=&quot;https://docs.oracle.com/javaee/7/api/javax/websocket/package-summary.html&quot;&gt;Websockets&lt;/a&gt; to allow a local CLI shell to remotely control a remote CLI shell. The websocket essentially just intercepted data that was being passed between the local CLI and backbend process and instead sends it through the websocket. As an added challenge we needed to maintain a stack of existing websockets to enable us to remember which node we were on before establishing a new websocket remote shell.&lt;/p&gt;
+
+&lt;p&gt;This project was a great introduction to many core distributed systems principles. The majority of the issues with implementing it came down to becoming familiar with the APIs and frameworks that we had to use.&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Problem&lt;/th&gt;
+      &lt;th&gt;Analysis&lt;/th&gt;
+      &lt;th&gt;Solution&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;RESTful PUT commands kept giving server errors, but only on certain requests&lt;/td&gt;
+      &lt;td&gt;PUT requires an entity to be included with an explicit data type, both server and client must agree on the data format&lt;/td&gt;
+      &lt;td&gt;made sure to explicitly designate what data formats were being sent and received for PUT commands. Also made sure there was always an entity included in the command&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Websocket remote control was losing context for local shell after closing all remote connections&lt;/td&gt;
+      &lt;td&gt;Connection closing logic was killing entire shell when there were no more valid connections&lt;/td&gt;
+      &lt;td&gt;Added extra CLI logic to handle return to local shell and trying to kill connection of a local shell&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+</description>
+        <pubDate>Sat, 26 Oct 2019 00:00:00 -0400</pubDate>
+        <link>http://localhost:4000/academic/2019/10/26/DHT.html</link>
+        <guid isPermaLink="true">http://localhost:4000/academic/2019/10/26/DHT.html</guid>
         
         
         <category>Academic</category>
