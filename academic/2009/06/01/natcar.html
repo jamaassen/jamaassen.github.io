@@ -83,7 +83,7 @@ The first issue I dealt with was how often and when to sample what. For the pure
   <span class="n">RTICTL</span> <span class="o">=</span> <span class="mh">0x20</span><span class="p">;</span> <span class="c1">// 2^10 / 13 Set RTI divider for 300HZ , 4 Hz time base 0x7F, 0x20 for 3906Hz</span></code></pre></figure>
 
 <figure class="highlight"><pre><code class="language-c--" data-lang="c++"><span class="cp">#pragma interrupt_handler rti_handler
-</span><span class="kt">void</span> <span class="n">rti_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>
+</span><span class="kt">void</span> <span class="nf">rti_handler</span><span class="p">(</span><span class="kt">void</span><span class="p">){</span>
   <span class="n">CRGFLG</span> <span class="o">|=</span> <span class="mh">0x80</span><span class="p">;</span> <span class="c1">// Clear the RTI Flag</span>
 
   <span class="c1">//average readings per cycle to reduce noise</span>

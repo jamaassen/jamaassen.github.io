@@ -6,9 +6,9 @@
 </description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml"/>
-    <pubDate>Sun, 31 May 2020 20:02:40 -0400</pubDate>
-    <lastBuildDate>Sun, 31 May 2020 20:02:40 -0400</lastBuildDate>
-    <generator>Jekyll v4.0.0</generator>
+    <pubDate>Sun, 26 Jul 2020 20:17:35 -0400</pubDate>
+    <lastBuildDate>Sun, 26 Jul 2020 20:17:35 -0400</lastBuildDate>
+    <generator>Jekyll v4.1.1</generator>
     
       <item>
         <title>Computer Vision Framework 5 - Non-Iterative Superpixel Segmentation</title>
@@ -722,7 +722,7 @@ The first issue I dealt with was how often and when to sample what. For the pure
   &lt;span class=&quot;n&quot;&gt;RTICTL&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x20&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// 2^10 / 13 Set RTI divider for 300HZ , 4 Hz time base 0x7F, 0x20 for 3906Hz&lt;/span&gt;&lt;/code&gt;&lt;/pre&gt;&lt;/figure&gt;
 
 &lt;figure class=&quot;highlight&quot;&gt;&lt;pre&gt;&lt;code class=&quot;language-c--&quot; data-lang=&quot;c++&quot;&gt;&lt;span class=&quot;cp&quot;&gt;#pragma interrupt_handler rti_handler
-&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;n&quot;&gt;rti_handler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
+&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt; &lt;span class=&quot;nf&quot;&gt;rti_handler&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;kt&quot;&gt;void&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;){&lt;/span&gt;
   &lt;span class=&quot;n&quot;&gt;CRGFLG&lt;/span&gt; &lt;span class=&quot;o&quot;&gt;|=&lt;/span&gt; &lt;span class=&quot;mh&quot;&gt;0x80&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;;&lt;/span&gt; &lt;span class=&quot;c1&quot;&gt;// Clear the RTI Flag&lt;/span&gt;
 
   &lt;span class=&quot;c1&quot;&gt;//average readings per cycle to reduce noise&lt;/span&gt;
